@@ -162,7 +162,7 @@ export async function saveFileData(formData) {
 export async function getUserFiles(userId) {
     await connectDB();
     const ownedByMe = await File.find({"owner.id": {"$eq": userId}}).sort({updatedAt: -1})
-    const sharedWithMe = await File.find({sharedUsers: {$elemMatch: {_id: userId}}}).sort({updatedAt: -1});
+    const sharedWithMe = await File.find({"sharedUsers._id": {"$eq": userId}}).sort({updatedAt: -1});
 
     return [ownedByMe, sharedWithMe]
 }
