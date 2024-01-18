@@ -151,7 +151,7 @@ export default function FileOptionsModal(props) {
                         Delete {fileTitle}?
                     </Typography>
                     <Typography id="modal-modal-description" sx={{mt: 2}}>
-                        "{fileTitle}" will be deleted permanently.
+                        {fileTitle} will be deleted permanently.
                     </Typography>
 
                     <Stack direction={'row'} spacing={2} sx={{mt: 2}}>
