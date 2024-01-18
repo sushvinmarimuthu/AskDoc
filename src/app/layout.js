@@ -5,7 +5,8 @@ import {createTheme, ThemeProvider} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
 import {Toaster} from "react-hot-toast";
-import { Analytics } from '@vercel/analytics/react';
+import {Analytics} from '@vercel/analytics/react';
+import {SpeedInsights} from '@vercel/speed-insights/next';
 
 export default function RootLayout({children}) {
     const themeProvider = createTheme({
@@ -39,10 +40,11 @@ export default function RootLayout({children}) {
             <link rel="icon" href="/LOGO.png" sizes="any"/>
         </head>
         <body>
-        <Analytics />
+        <Analytics/>
+        <SpeedInsights/>
         <ThemeProvider theme={themeProvider}>
             <CssBaseline/>
-            <Toaster />
+            <Toaster/>
             <Container maxWidth="xl">
                 {children}
             </Container>
