@@ -28,14 +28,14 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
 import {Collaboration} from "@tiptap/extension-collaboration";
 import Placeholder from '@tiptap/extension-placeholder';
-// import {CollaborationCursor} from "@tiptap/extension-collaboration-cursor";
+import {CollaborationCursor} from "@tiptap/extension-collaboration-cursor";
 import EditorToolbar from "@/app/components/Editor/EditorToolbar";
 import {Highlight} from "@tiptap/extension-highlight";
 import {Color} from "@tiptap/extension-color";
 import {Link} from "@tiptap/extension-link";
 import * as Y from "yjs";
 import {getFile, saveFileData} from "@/app/lib/FileActions";
-// import {TiptapCollabProvider} from "@hocuspocus/provider";
+import {TiptapCollabProvider} from "@hocuspocus/provider";
 
 const FileEditor = dynamic(() => import('@/app/components/File/FileEditor'), {
     ssr: false,
@@ -48,11 +48,11 @@ const FilePreview = dynamic(() => import('@/app/components/File/FilePreview'), {
 })
 
 const doc = new Y.Doc();
-// const provider = new TiptapCollabProvider({
-//     appId: '7j9y6m10',
-//     name: 'room1',
-//     document: doc,
-// })
+const provider = new TiptapCollabProvider({
+    appId: '7j9y6m10',
+    name: 'room1',
+    document: doc,
+})
 
 export default function Editor(props) {
     const {fileId, userId, searchParams, user, file, fileAccess, files, owner, fileSharedUsers} = props;
@@ -97,13 +97,13 @@ export default function Editor(props) {
             Collaboration.configure({
                 document: doc,
             }),
-            // CollaborationCursor.configure({
-            //     provider: provider,
-            //     user: {
-            //         name: user.name,
-            //         color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-            //     },
-            // }),
+            CollaborationCursor.configure({
+                provider: provider,
+                user: {
+                    name: user.name,
+                    color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+                },
+            }),
             Placeholder.configure({
                 placeholder:
                     'Write something...',
