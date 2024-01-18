@@ -68,7 +68,8 @@
     "react-dom": "^18",
     "react-drag-drop-files": "^2.3.10",
     "react-hot-toast": "^2.4.1",
-    "rtf2text": "^1.0.1"
+    "rtf2text": "^1.0.1",
+    "yjs": "^13.6.10"
   },
   "devDependencies": {
     "eslint": "^8",
