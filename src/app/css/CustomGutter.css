@@ -1,0 +1,7 @@
+.custom-gutter-horizontal {
+  padding: 0 1px;
+  width: 5px;
+  min-height: 700px;
+  height: 100%;
+  background: rgb(128, 128, 128);
+}
