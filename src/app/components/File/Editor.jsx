@@ -52,7 +52,7 @@ export default function Editor(props) {
     const {fileId, userId, searchParams, user, file, fileAccess, files, owner, fileSharedUsers} = props;
 
     const provider = new HocuspocusProvider({
-        url: 'ws://0.0.0.0:1234',
+        url: 'wss://0.0.0.0:1234',
         name: fileId,
         document: doc,
     })
