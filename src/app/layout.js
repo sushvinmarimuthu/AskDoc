@@ -5,6 +5,7 @@ import {createTheme, ThemeProvider} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
 import {Toaster} from "react-hot-toast";
+import { Analytics } from '@vercel/analytics/react';
 
 export default function RootLayout({children}) {
     const themeProvider = createTheme({
@@ -38,6 +39,7 @@ export default function RootLayout({children}) {
             <link rel="icon" href="/LOGO.png" sizes="any"/>
         </head>
         <body>
+        <Analytics />
         <ThemeProvider theme={themeProvider}>
             <CssBaseline/>
             <Toaster />
