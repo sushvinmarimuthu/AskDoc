@@ -26,7 +26,7 @@ import IconButton from "@mui/material/IconButton";
 import {createFile, textTranslation} from "@/app/lib/FileActions";
 
 export default function EditorToolbar(props) {
-    let {editor, fileAccess, fileId, userId, fileSaved, setPreviewId, file, files, owner, fileSharedUsers} = props;
+    let {editor, fileAccess, fileId, userId, fileSaved, file, files, owner, fileSharedUsers, handlePreviewFile} = props;
     const [sourceLang, setSourceLang] = useState('eng');
     const [targetLang, setTargetLang] = useState(null);
     const router = useRouter();
@@ -109,7 +109,7 @@ export default function EditorToolbar(props) {
                                 disablePortal
                                 disableClearable
                                 onChange={(event, data) => {
-                                    setPreviewId(data?.id);
+                                    handlePreviewFile(data?.id);
                                 }}
                                 id="files"
                                 options={files}

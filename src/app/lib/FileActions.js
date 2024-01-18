@@ -156,7 +156,7 @@ export async function saveFileData(formData) {
         file.markModified('description');
         file.save()
     }
-    revalidatePath('/')
+    // revalidatePath('/')
 }
 
 export async function getUserFiles(userId) {

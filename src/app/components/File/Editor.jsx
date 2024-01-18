@@ -27,14 +27,15 @@ import TableRow from "@tiptap/extension-table-row";
 import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
 import {Collaboration} from "@tiptap/extension-collaboration";
-import {CollaborationCursor} from "@tiptap/extension-collaboration-cursor";
+import Placeholder from '@tiptap/extension-placeholder';
+// import {CollaborationCursor} from "@tiptap/extension-collaboration-cursor";
 import EditorToolbar from "@/app/components/Editor/EditorToolbar";
 import {Highlight} from "@tiptap/extension-highlight";
 import {Color} from "@tiptap/extension-color";
 import {Link} from "@tiptap/extension-link";
 import * as Y from "yjs";
-import {HocuspocusProvider} from "@hocuspocus/provider";
 import {getFile, saveFileData} from "@/app/lib/FileActions";
+// import {TiptapCollabProvider} from "@hocuspocus/provider";
 
 const FileEditor = dynamic(() => import('@/app/components/File/FileEditor'), {
     ssr: false,
@@ -47,36 +48,18 @@ const FilePreview = dynamic(() => import('@/app/components/File/FilePreview'), {
 })
 
 const doc = new Y.Doc();
+// const provider = new TiptapCollabProvider({
+//     appId: '7j9y6m10',
+//     name: 'room1',
+//     document: doc,
+// })
 
 export default function Editor(props) {
     const {fileId, userId, searchParams, user, file, fileAccess, files, owner, fileSharedUsers} = props;
 
-    const provider = new HocuspocusProvider({
-        url: 'wss://0.0.0.0:1234',
-        name: fileId,
-        document: doc,
-    })
-
     const [fileData, setFileData] = useState(file.fileData);
-
     const [fileSaved, setFileSaved] = useState(true);
-
-    const [previewId, setPreviewId] = useState(null);
     const [previewFile, setPreviewFile] = useState(null);
-
-    useEffect(() => {
-        if (previewId) {
-            handlePreviewFile(previewId).then(r => {
-                console.log(r);
-            });
-        }
-    }, [previewId]);
-
-    async function handlePreviewFile(previewId) {
-        await getFile(previewId).then((response) => {
-            setPreviewFile(response);
-        })
-    }
 
     const editor = useEditor({
         extensions: [
@@ -112,19 +95,29 @@ export default function Editor(props) {
                 protocols: ['ftp', 'mailto'],
             }),
             Collaboration.configure({
-                document: provider.document,
+                document: doc,
             }),
-            CollaborationCursor.configure({
-                provider: provider,
-                user: {
-                    name: user.name,
-                    color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-                },
+            // CollaborationCursor.configure({
+            //     provider: provider,
+            //     user: {
+            //         name: user.name,
+            //         color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+            //     },
+            // }),
+            Placeholder.configure({
+                placeholder:
+                    'Write something...',
             }),
         ],
         editable: (fileAccess && file.type !== 'application/pdf'),
         autofocus: true,
     });
+
+    async function handlePreviewFile(previewId) {
+        await getFile(previewId).then((response) => {
+            setPreviewFile(response);
+        })
+    }
 
     async function handleFileUpdate(fileData) {
         setFileSaved(false)
@@ -163,8 +156,8 @@ export default function Editor(props) {
         <>
             <Box sx={{mt: 2}}>
                 <EditorToolbar editor={editor} fileAccess={fileAccess} fileId={fileId} userId={userId}
-                               fileSaved={fileSaved} setPreviewId={setPreviewId} file={file} files={files} owner={owner}
-                               fileSharedUsers={fileSharedUsers}
+                               fileSaved={fileSaved} file={file} files={files} owner={owner}
+                               fileSharedUsers={fileSharedUsers} handlePreviewFile={handlePreviewFile}
                 />
                 <Divider/>
                 <Splitter direction={SplitDirection.Horizontal}
