@@ -5,9 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "ws": "npx @hocuspocus/cli --port 1234"
+    "start": "next start & npx @hocuspocus/cli --port 1234",
+    "lint": "next lint"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^2.0.13",
