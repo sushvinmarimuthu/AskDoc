@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useRef, useState} from "react";
+import React, {useState} from "react";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -9,23 +9,19 @@ import {ClickAwayListener, Grow, InputAdornment, MenuList, Paper} from "@mui/mat
 import SearchIcon from '@mui/icons-material/Search';
 import Stack from "@mui/material/Stack";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import {Popper} from "@mui/base";
 import MenuItem from "@mui/material/MenuItem";
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
 import IconButton from "@mui/material/IconButton";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import Menu from "@mui/material/Menu";
 
 const filterOptions = ['All files', 'Owned by me', 'Shared with me'];
 
-function Search() {
+export default function Search() {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const {replace} = useRouter();
     const params = new URLSearchParams(searchParams);
-
-    // Sorting
-    const [buttonColor, setButtonColor] = useState("inherit");
-    const [selectedIndex, setSelectedIndex] = useState(0);
 
     function handleChange(event) {
         const {value} = event.target;
@@ -40,17 +36,11 @@ function Search() {
     function handleSort() {
         if (params.has('sortBy')) {
             params.delete('sortBy')
-            setButtonColor("inherit")
         } else {
             params.set('sortBy', 'title')
-            setButtonColor("primary")
         }
         replace(`${pathname}?${params}`);
     }
-
-    // Files to Show
-    const [openFilterMenu, setOpenFilterMenu] = useState(false);
-    const anchorFilterMenuRef = useRef(null);
 
     const handleFilterMenuItemClick = (event, index) => {
         if (index === 0 || params.has('ownedByMe') || params.has('sharedWithMe')) {
@@ -60,21 +50,18 @@ function Search() {
         } else if (index === 2) {
             params.set('filterBy', 'sharedWithMe')
         }
-        setSelectedIndex(index);
-        setOpenFilterMenu(false);
+        handleFilterMenuClose();
         replace(`${pathname}?${params}`);
     };
 
-    const handleFilterToggle = () => {
-        setOpenFilterMenu((prevOpen) => !prevOpen);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleFilterMenuClick = (event) => {
+        setAnchorEl(event.currentTarget);
     };
-
-    const handleFilterMenuClose = (event) => {
-        if (anchorFilterMenuRef.current && anchorFilterMenuRef.current.contains(event.target)) {
-            return;
-        }
-
-        setOpenFilterMenu(false);
+    const handleFilterMenuClose = () => {
+        setAnchorEl(null);
     };
 
     return (
@@ -108,54 +95,43 @@ function Search() {
                         <Grid item>
                             <Stack direction={'row'} spacing={2}>
                                 <Button
-                                    ref={anchorFilterMenuRef}
-                                    size="small"
-                                    aria-controls={openFilterMenu ? 'filter-menu-button' : undefined}
-                                    aria-expanded={openFilterMenu ? 'true' : undefined}
-                                    aria-label="Filter Menu"
-                                    aria-haspopup="filter-menu"
-                                    onClick={handleFilterToggle}
+                                    id="filter-button"
+                                    aria-controls={open ? 'filter-menu' : undefined}
+                                    aria-haspopup="true"
+                                    aria-expanded={open ? 'true' : undefined}
+                                    onClick={handleFilterMenuClick}
                                     endIcon={<ArrowDropDownIcon/>}
                                 >
-                                    {filterOptions[selectedIndex]}
+                                    {filterOptions[params.get('filterBy') === 'ownedByMe' ? 1 : params.get('filterBy') === 'sharedWithMe' ? 2 : 0]}
                                 </Button>
-                                <Popper
-                                    sx={{
-                                        zIndex: 1,
+                                <Menu
+                                    id="filter-menu"
+                                    anchorEl={anchorEl}
+                                    open={open}
+                                    onClose={handleFilterMenuClose}
+                                    MenuListProps={{
+                                        'aria-labelledby': 'filter-button',
                                     }}
-                                    open={openFilterMenu}
-                                    anchorEl={anchorFilterMenuRef.current}
-                                    role={undefined}
-                                    transition
                                 >
-                                    {({TransitionProps, placement}) => (
-                                        <Grow
-                                            {...TransitionProps}
-                                            style={{
-                                                transformOrigin:
-                                                    placement === 'bottom' ? 'center top' : 'center bottom',
-                                            }}
-                                        >
-                                            <Paper>
-                                                <ClickAwayListener onClickAway={handleFilterMenuClose}>
-                                                    <MenuList id="filter-menu-button" autoFocusItem>
-                                                        {filterOptions.map((option, index) => (
-                                                            <MenuItem
-                                                                key={option}
-                                                                selected={index === selectedIndex}
-                                                                onClick={(event) => handleFilterMenuItemClick(event, index)}
-                                                            >
-                                                                {option}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </MenuList>
-                                                </ClickAwayListener>
-                                            </Paper>
-                                        </Grow>
-                                    )}
-                                </Popper>
+                                    <ClickAwayListener onClickAway={handleFilterMenuClose}>
+                                        <MenuList id="filter-menu-button" autoFocusItem>
+                                            {filterOptions.map((option, index) => (
+                                                <MenuItem
+                                                    key={option}
+                                                    selected={
+                                                        index === (params.get('filterBy') === 'ownedByMe' ? 1 : params.get('filterBy') === 'sharedWithMe' ? 2 : 0)
+                                                    }
+                                                    onClick={(event) => handleFilterMenuItemClick(event, index)}
+                                                >
+                                                    {option}
+                                                </MenuItem>
+                                            ))}
+                                        </MenuList>
+                                    </ClickAwayListener>
+                                </Menu>
 
-                                <IconButton color={buttonColor} onClick={handleSort}>
+                                <IconButton color={params.get('sortBy') === 'title' ? 'primary' : 'inherit'}
+                                            onClick={handleSort}>
                                     <SortByAlphaIcon/>
                                 </IconButton>
                             </Stack>
@@ -167,4 +143,3 @@ function Search() {
     );
 }
 
-export default Search;

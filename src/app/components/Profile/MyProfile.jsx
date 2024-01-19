@@ -9,24 +9,32 @@ import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import {updateUserData} from "@/app/lib/UserActions";
-import {useState} from "react";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
 
 
 export default function MyProfile({user}) {
-    const [activeField, setActiveField] = useState(false);
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const {replace} = useRouter();
+    const params = new URLSearchParams(searchParams);
 
     function handleActiveField() {
-        if (!activeField) {
-            setActiveField(true);
+        if (params.has('activeField') && params.get('activeField') === 'active') {
+            params.delete('activeField')
         } else {
-            setActiveField(false);
+            params.set('activeField', 'active')
         }
+        replace(`${pathname}?${params}`);
     }
 
     async function handleUpdate(formData) {
         formData.append("userId", user._id);
-        await updateUserData(formData);
-        setActiveField(false);
+        await updateUserData(formData).then(() => {
+            if (params.has('activeField') && params.get('activeField') === 'active') {
+                params.delete('activeField')
+                replace(`${pathname}?${params}`);
+            }
+        })
     }
 
     return (
@@ -46,10 +54,10 @@ export default function MyProfile({user}) {
                     type="file"
                     name={'file'}
                     hidden
-                    disabled={!activeField}
+                    disabled={!params.has('activeField')}
                 />
                 <label htmlFor="profile-input">
-                    {activeField ?
+                    {params.has('activeField') ?
                         <IconButton component='span'>
                             <Avatar
                                 alt="ProfilePic"
@@ -75,7 +83,7 @@ export default function MyProfile({user}) {
                     placeholder="Name" name={"name"} id={"name"}
                     variant="outlined" fullWidth sx={{my: 2}} required
                     defaultValue={user.name}
-                    disabled={!activeField}
+                    disabled={!params.has('activeField')}
                 />
             </Box>
             <Box sx={{width: '50%'}}>
@@ -90,9 +98,9 @@ export default function MyProfile({user}) {
             </Box>
             <Stack spacing={2} direction="row">
                 <Button variant={'contained'} type={"submit"}
-                        disabled={!activeField}>Update</Button>
+                        disabled={!params.has('activeField')}>Update</Button>
                 <Button variant={'contained'} onClick={handleActiveField}>
-                    {activeField ? 'Cancel' : 'Edit'}
+                    {params.has('activeField') ? 'Cancel' : 'Edit'}
                 </Button>
             </Stack>
         </Stack>
