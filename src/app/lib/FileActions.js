@@ -196,7 +196,9 @@ export async function downloadFile(fileId, fileType, userId) {
     await connectDB();
 
     const file = await File.findOne({_id: new ObjectId(fileId)});
-    const filePath = path.join("public", `/downloads/files/${userId}`);
+    // const filePath = path.join("public", `/downloads/files/${userId}`);
+    const filePath = `/public/downloads/files/${userId}`
+    console.log("filePath - ", filePath)
     await fs.mkdir(filePath, {recursive: true})
     if (fileType === '.docx') {
         const docxRes = await htmlToDocx(file.fileData, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
