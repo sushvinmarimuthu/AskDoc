@@ -197,7 +197,7 @@ export async function downloadFile(fileId, fileType, userId) {
 
     const file = await File.findOne({_id: new ObjectId(fileId)});
     // const filePath = path.join("public", `/downloads/files/${userId}`);
-    const filePath = `/public/downloads/files/${userId}`
+    const filePath = `/downloads/files/${userId}`
     console.log("filePath - ", filePath)
     await fs.mkdir(filePath, {recursive: true})
     if (fileType === '.docx') {
