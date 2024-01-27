@@ -36,6 +36,7 @@ import {Link} from "@tiptap/extension-link";
 import * as Y from "yjs";
 import {getFile, saveFileData} from "@/app/lib/FileActions";
 import {TiptapCollabProvider} from "@hocuspocus/provider";
+import EditorPreviewComp from "@/app/components/Editor/EditorPreviewComp";
 
 const FileEditor = dynamic(() => import('@/app/components/File/FileEditor'), {
     ssr: false,
@@ -50,7 +51,6 @@ const FilePreview = dynamic(() => import('@/app/components/File/FilePreview'), {
 const doc = new Y.Doc();
 const provider = new TiptapCollabProvider({
     appId: '7j9y6m10',
-    name: 'room1',
     document: doc,
 })
 
@@ -60,6 +60,8 @@ export default function Editor(props) {
     const [fileData, setFileData] = useState(file.fileData);
     const [fileSaved, setFileSaved] = useState(true);
     const [previewFile, setPreviewFile] = useState(null);
+
+    provider.name = fileId;
 
     const editor = useEditor({
         extensions: [
@@ -163,6 +165,44 @@ export default function Editor(props) {
                 <Splitter direction={SplitDirection.Horizontal}
                           gutterClassName="custom-gutter-horizontal"
                 >
+                    {/*<Box sx={{*/}
+                    {/*    borderRadius: '0 0 0 10px',*/}
+                    {/*    display: "flex",*/}
+                    {/*    flexDirection: "column",*/}
+                    {/*    height: "700px",*/}
+                    {/*    backgroundColor: 'white',*/}
+                    {/*    boxShadow: 2*/}
+                    {/*}}>*/}
+                    {/*    <>*/}
+                    {/*        <Typography variant={'h6'} sx={{textAlign: 'center', fontWeight: 'bold'}}>*/}
+                    {/*            Preview(Read-Only)*/}
+                    {/*        </Typography>*/}
+                    {/*        <Divider sx={{mb: 1.5}}/>*/}
+                    {/*        {(searchParams.mode === 'view' || searchParams?.mode === undefined) &&*/}
+                    {/*            <Box sx={{*/}
+                    {/*                overflow: "hidden",*/}
+                    {/*                overflowY: "scroll",*/}
+                    {/*            }}>*/}
+                    {/*                {previewFile ?*/}
+                    {/*                    previewFile.type === 'application/pdf' ?*/}
+                    {/*                        <iframe*/}
+                    {/*                            src={`${previewFile.fileData}#toolbar=0&navpanes=0&scrollbar=0`}*/}
+                    {/*                            style={{minHeight: '100vh', width: '100%'}}/>*/}
+                    {/*                        :*/}
+                    {/*                        <FilePreview fileData={previewFile.fileData}/>*/}
+                    {/*                    :*/}
+
+                    {/*                    file.type === 'application/pdf' ?*/}
+                    {/*                        <iframe src={`${file.fileData}#toolbar=0&navpanes=0&scrollbar=0`}*/}
+                    {/*                                style={{minHeight: '100vh', width: '100%'}}/>*/}
+                    {/*                        :*/}
+                    {/*                        <FilePreview fileData={fileData}/>*/}
+                    {/*                }*/}
+                    {/*            </Box>*/}
+                    {/*        }*/}
+                    {/*    </>*/}
+                    {/*</Box>*/}
+
                     <Box sx={{
                         borderRadius: '0 0 0 10px',
                         display: "flex",
@@ -171,36 +211,8 @@ export default function Editor(props) {
                         backgroundColor: 'white',
                         boxShadow: 2
                     }}>
-                        <>
-                            <Typography variant={'h6'} sx={{textAlign: 'center', fontWeight: 'bold'}}>
-                                Preview(Read-Only)
-                            </Typography>
-                            <Divider sx={{mb: 1.5}}/>
-                            {(searchParams.mode === 'view' || searchParams?.mode === undefined) &&
-                                <Box sx={{
-                                    overflow: "hidden",
-                                    overflowY: "scroll",
-                                }}>
-                                    {previewFile ?
-                                        previewFile.type === 'application/pdf' ?
-                                            <iframe
-                                                src={`${previewFile.fileData}#toolbar=0&navpanes=0&scrollbar=0`}
-                                                style={{minHeight: '100vh', width: '100%'}}/>
-                                            :
-                                            <FilePreview fileData={previewFile.fileData}/>
-                                        :
-
-                                        file.type === 'application/pdf' ?
-                                            <iframe src={`${file.fileData}#toolbar=0&navpanes=0&scrollbar=0`}
-                                                    style={{minHeight: '100vh', width: '100%'}}/>
-                                            :
-                                            <FilePreview fileData={fileData}/>
-                                    }
-                                </Box>
-                            }
-                        </>
+                        <EditorPreviewComp doc={doc}/>
                     </Box>
-
                     <Box sx={{
                         opacity: fileAccess ? 1 : 0.4,
                         borderRadius: '0 0 10px 0',

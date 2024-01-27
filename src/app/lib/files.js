@@ -1,6 +1,6 @@
 'use server';
 
-import File from "@/app/models/File";
+import File from "@/app/models/Paper";
 
 export const validateFileName = async (newName) => {
     const existingName = await File.findOne({title: newName});

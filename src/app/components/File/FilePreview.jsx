@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {RichTextReadOnly} from "mui-tiptap";
 import StarterKit from "@tiptap/starter-kit";
 import FontFamily from '@tiptap/extension-font-family'

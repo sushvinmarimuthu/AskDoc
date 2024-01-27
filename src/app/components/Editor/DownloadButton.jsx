@@ -28,7 +28,7 @@ export default function DownloadButton({fileData, fileId, userId}) {
         await handleFileUpdate(fileId, fileData);
         await downloadFile(fileId, fileType, userId).then((response) => {
             const link = document.createElement("a");
-            link.href = response.replace('public', '');
+            link.href = response;
             link.download = response.slice(response.lastIndexOf('/') + 1);
             link.click();
         })
@@ -61,12 +61,12 @@ export default function DownloadButton({fileData, fileId, userId}) {
             >
                 <MenuItem onClick={() => handleDownloadFile('.docx')}>Microsoft Word
                     (.docx)</MenuItem>
-                {/*<MenuItem onClick={() => handleDownloadFile('.rtf')}>Rich Text Format*/}
-                {/*    (.rtf)</MenuItem>*/}
+                <MenuItem onClick={() => handleDownloadFile('.rtf')}>Rich Text Format
+                    (.rtf)</MenuItem>
                 {/*<MenuItem onClick={() => handleDownloadFile('.pdf')}>PDF Document*/}
                 {/*    (.pdf)</MenuItem>*/}
-                <MenuItem onClick={() => handleDownloadFile('.txt')}>Plain Text
-                    (.txt)</MenuItem>
+                {/*<MenuItem onClick={() => handleDownloadFile('.txt')}>Plain Text*/}
+                {/*    (.txt)</MenuItem>*/}
             </Menu>
         </>
     );

@@ -184,7 +184,7 @@ export default function EditorToolbar(props) {
 
                         <MenuButtonSubscript/>
                         <MenuButtonSuperscript/>
-                        <MenuDivider/>
+                        {/*<MenuDivider/>*/}
 
                         <MenuSelectTextAlign/>
                         <MenuButtonTaskList/>
@@ -194,7 +194,7 @@ export default function EditorToolbar(props) {
 
                         <MenuButtonAddTable/>
                         <TableBubbleMenu/>
-                        <MenuDivider/>
+                        {/*<MenuDivider/>*/}
 
                         <Stack direction="row" spacing={1}>
                             <ToolsButton

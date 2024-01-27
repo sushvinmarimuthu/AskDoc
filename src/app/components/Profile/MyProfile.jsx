@@ -61,14 +61,14 @@ export default function MyProfile({user}) {
                         <IconButton component='span'>
                             <Avatar
                                 alt="ProfilePic"
-                                src={user.image?.replace('public', '')}
+                                src={user.image}
                                 sx={{width: 300, height: 300}}
                             />
                         </IconButton>
                         :
                         <Avatar
                             alt="ProfilePic"
-                            src={user.image?.replace('public', '')}
+                            src={user.image}
                             sx={{width: 300, height: 300}}
                         />
                     }

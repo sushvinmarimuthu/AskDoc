@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
-const FileSchema = new Schema({
+const PaperSchema = new Schema({
     title: String,
     description: String,
     fileData: String,
@@ -17,5 +17,5 @@ const FileSchema = new Schema({
 }, {timestamps: true});
 
 
-const File = mongoose.models.File || mongoose.model('File', FileSchema);
-export default File;
+const Paper = mongoose.models.Paper || mongoose.model('Paper', PaperSchema);
+export default Paper;

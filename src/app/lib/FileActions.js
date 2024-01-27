@@ -8,13 +8,14 @@ import {convertHtmlToRtf, getDocxData, strToUint8Array, validateFileName} from "
 import mammoth from "mammoth";
 import {parse} from "node-html-parser";
 import {PDFDocument} from "pdf-lib";
-import File from "@/app/models/File";
+import Paper from "@/app/models/Paper";
 import {NextResponse} from "next/server";
 import {revalidatePath} from "next/cache";
 import path from "path";
 import fs from "fs/promises";
 import htmlToDocx from "html-to-docx"; //TODO: Deprecated, Replace with updated Packages.
 import _ from "lodash";
+import {put} from "@vercel/blob";
 
 async function getRTF(fileText) {
     return await new Promise((resolve, reject) => {
@@ -91,7 +92,7 @@ export async function uploadFile(formData) {
                 description = fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description';
             }
 
-            result = await File.create({
+            result = await Paper.create({
                 title: title,
                 description: description,
                 fileData: fileData,
@@ -103,7 +104,7 @@ export async function uploadFile(formData) {
             revalidatePath(`/${userId}/home`)
         })
         .catch(() => {
-            return NextResponse.json({status: 409, error: "Post File Data failed."})
+            return NextResponse.json({status: 409, error: "Post Paper Data failed."})
         });
 }
 
@@ -115,7 +116,7 @@ export async function createFile(formData) {
     const user = await User.findById({_id: new ObjectId(userId)});
     const userData = {id: user._id, name: user.name, email: user.email};
 
-    const fileResult = await File.create({
+    const fileResult = await Paper.create({
         title: title,
         description: 'Description',
         fileData: '',
@@ -133,12 +134,12 @@ export async function renameFile(formData) {
     const fileId = formData.get('fileId');
     const name = formData.get('name');
 
-    await File.findOneAndUpdate({_id: new ObjectId(fileId)}, {title: name})
+    await Paper.findOneAndUpdate({_id: new ObjectId(fileId)}, {title: name})
     revalidatePath(`/${userId}/home`)
 }
 
 export async function deleteFile(fileId, userId) {
-    await File.findOneAndDelete({_id: new ObjectId(fileId)});
+    await Paper.findOneAndDelete({_id: new ObjectId(fileId)});
     revalidatePath(`/${userId}/home`)
 }
 
@@ -147,7 +148,7 @@ export async function saveFileData(formData) {
     const fileData = formData.get('fileData');
     const fileId = formData.get('fileId');
 
-    const file = await File.findOne({_id: new ObjectId(fileId)})
+    const file = await Paper.findOne({_id: new ObjectId(fileId)})
     if (file) {
         file.fileData = fileData
         file.size = fileData.length
@@ -161,15 +162,15 @@ export async function saveFileData(formData) {
 
 export async function getUserFiles(userId) {
     await connectDB();
-    const ownedByMe = await File.find({"owner.id": {"$eq": userId}}).sort({updatedAt: -1})
-    const sharedWithMe = await File.find({"sharedUsers._id": {"$eq": userId}}).sort({updatedAt: -1});
+    const ownedByMe = await Paper.find({"owner.id": {"$eq": userId}}).sort({updatedAt: -1})
+    const sharedWithMe = await Paper.find({"sharedUsers._id": {"$eq": userId}}).sort({updatedAt: -1});
 
     return [ownedByMe, sharedWithMe]
 }
 
 export async function getFile(fileId) {
     await connectDB();
-    return File.findOne({_id: new ObjectId(fileId)});
+    return Paper.findOne({_id: new ObjectId(fileId)});
 }
 
 export async function textTranslation(formData) {
@@ -195,29 +196,45 @@ export async function textTranslation(formData) {
 export async function downloadFile(fileId, fileType, userId) {
     await connectDB();
 
-    const file = await File.findOne({_id: new ObjectId(fileId)});
-    // const filePath = path.join("public", `/downloads/files/${userId}`);
-    const filePath = `/downloads/files/${userId}`
-    console.log("filePath - ", filePath)
-    await fs.mkdir(filePath, {recursive: true})
+    const file = await Paper.findOne({_id: new ObjectId(fileId)});
+    let blob;
     if (fileType === '.docx') {
-        const docxRes = await htmlToDocx(file.fileData, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        await fs.writeFile(`${filePath}/doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.docx`, docxRes);
+        const docxRes = await htmlToDocx(file.fileData, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        const filePath = `doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.docx`
+        await fs.writeFile(filePath, docxRes);
+        const docsFile = await fs.readFile(filePath);
+        blob = await put(`papers/${fileId}.docx`, docsFile, {
+            access: 'public',
+        })
+        await fs.unlink(filePath);
     } else if (fileType === '.rtf') {
-        const RTF_Res = convertHtmlToRtf(file.fileData);
-        await fs.writeFile(`${filePath}/doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.rtf`, RTF_Res);
+        const RTF_Res = await convertHtmlToRtf(file.fileData);
+        const filePath = `doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.rtf`
+        await fs.writeFile(filePath, RTF_Res);
+        const rtfFile = await fs.readFile(filePath);
+        blob = await put(`papers/${fileId}.rtf`, rtfFile, {
+            access: 'public',
+        });
+        await fs.unlink(filePath);
     } else if (fileType === '.txt') {
-        const Txt_Res = file.fileData.replace(/<[^>]+>/g, '');
-        await fs.writeFile(`${filePath}/doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.txt`, Txt_Res);
+        const txt_res = file.fileData.replace(/<[^>]+>/g, '');
+        const filePath = `doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.txt`
+        await fs.writeFile(filePath, txt_res);
+        const txtFile = await fs.readFile(filePath);
+        blob = await put(`papers/${fileId}.txt`, txtFile, {
+            access: 'public',
+        });
+        await fs.unlink(filePath);
     }
-
-    return `${filePath}/doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_') + fileType}`
+    console.log("Link - ", blob.url)
+    console.log("Link sliced - ", blob.url.slice(blob.url.lastIndexOf('/') + 1))
+    return blob.url;
 }
 
 export async function removeFileAccess(fileId, userId) {
     await connectDB();
 
-    const file = await File.findOne({_id: new ObjectId(fileId)});
+    const file = await Paper.findOne({_id: new ObjectId(fileId)});
     const index = file.sharedUsers.findIndex(su => su._id === userId)
     if (index === -1) {
         throw new Error("User not found.")
@@ -235,7 +252,7 @@ export async function updateFilePermission(formData) {
     const isReadWrite = formData.get('isReadWrite');
 
     if (isReadWrite === 'read' || isReadWrite === 'write') {
-        const file = await File.findOne({_id: new ObjectId(fileId)});
+        const file = await Paper.findOne({_id: new ObjectId(fileId)});
         emailsResult.map(_id => {
             const index = file.sharedUsers.findIndex(su => su._id === _id)
             if (index === -1) {
@@ -261,7 +278,7 @@ export async function updateFilePermission(formData) {
 
 export async function getSharedUsers(fileId) {
     await connectDB();
-    const file = await File.findOne({_id: new ObjectId(fileId)});
+    const file = await Paper.findOne({_id: new ObjectId(fileId)});
     let result = [];
     let sharedUserIds = [];
     file?.sharedUsers?.map(data => {

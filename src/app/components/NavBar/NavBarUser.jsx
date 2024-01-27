@@ -37,7 +37,7 @@ export default function NavBarUser({user}) {
                 <Tooltip title="Open Menu">
                     <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
                         <Avatar alt="Profile Photo"
-                                src={user?.image ? user?.image?.replace('public', '') : ''}/>
+                                src={user.image}/>
                     </IconButton>
                 </Tooltip>
                 <Menu

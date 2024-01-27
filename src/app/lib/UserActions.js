@@ -9,6 +9,7 @@ import {revalidatePath} from "next/cache";
 import bcrypt from "bcrypt";
 import {registerPasswordValidator, resetPasswordValidator} from "@/app/lib/users";
 import bcryptjs from "bcrypt";
+import {put} from '@vercel/blob';
 
 
 export async function registerUser(formData) {
@@ -58,30 +59,19 @@ export async function updateUserData(formData) {
 
     const id = formData.get('userId');
     const name = formData.get('name');
-    const profileImage = formData.get('file');
+    const imageFile = formData.get('file');
 
-    if (name && profileImage.name === "undefined") {
+    if (name && imageFile.name === "undefined") {
         await User.findOneAndUpdate({_id: new ObjectId(id)}, {name: name});
     }
 
-    const uploadDir = path.join("public", `/uploads/profiles/${id}/`);
-    await fs.mkdir(uploadDir, {recursive: true})
-    const fileName = `${id}_${profileImage.name}`
-    const photoURL = path.join("public", `/uploads/profiles/${id}/${fileName}`);
-    if (name && profileImage.name !== "undefined") {
-        profileImage.arrayBuffer()
-            .then(async (imageData) => {
-                const files = await fs.readdir(uploadDir);
-                for (const file of files) {
-                    await fs.unlink(path.join(uploadDir, file));
-                }
-                await fs.writeFile(photoURL, Buffer.from(imageData))
-            })
-            .catch(() => {
-                return "Profile Update failed."
-            });
+    if (name && imageFile.name !== "undefined") {
+        const ext = imageFile.name.split('.')[1]
 
-        await User.findOneAndUpdate({_id: new ObjectId(id)}, {name: name, image: photoURL});
+        const blob = await put(`avatars/${id}.${ext}`, imageFile, {
+            access: 'public',
+        });
+        await User.findOneAndUpdate({_id: new ObjectId(id)}, {name: name, image: blob.url});
     }
 
     revalidatePath(`/`);
@@ -178,7 +168,6 @@ export async function getUserEmail(email, ownerId) {
     })
     return emails;
 }
-
 
 
 export async function getUser(userId) {

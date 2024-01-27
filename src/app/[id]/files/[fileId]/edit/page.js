@@ -1,5 +1,5 @@
 import User from "@/app/models/User";
-import File from "@/app/models/File";
+import Paper from "@/app/models/Paper";
 import {checkFileAccess} from "@/app/lib/files";
 import Loading from "@/app/[id]/loading";
 import React, {Suspense} from "react";
@@ -12,7 +12,7 @@ export default async function FileEditorPreviewPage({params, searchParams}) {
     const userId = params.id;
 
     const user = await User.findOne({_id: userId})
-    const file = await File.findOne({_id: fileId})
+    const file = await Paper.findOne({_id: fileId})
     if (!file) {
         return notFound()
     }
