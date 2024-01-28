@@ -16,7 +16,6 @@ import fs from "fs/promises";
 import htmlToDocx from "html-to-docx"; //TODO: Deprecated, Replace with updated Packages.
 import _ from "lodash";
 import {put} from "@vercel/blob";
-import html2pdf from "html2pdf.js/src";
 
 async function getRTF(fileText) {
     return await new Promise((resolve, reject) => {
@@ -164,9 +163,9 @@ export async function saveFileData(formData) {
             size: fileData.length,
             description: fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description'
         })
-        // .then(() => {
-        //     console.log("File Data Updated")
-        // })
+    // .then(() => {
+    //     console.log("File Data Updated")
+    // })
 
     // if (file) {
     //     file.fileData = fileData
@@ -219,7 +218,7 @@ export async function downloadFile(fileId, fileType, filePath = null) {
     let blob;
     if (fileType === '.docx') {
         const docxRes = await htmlToDocx(file.fileData, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-        const filePath = `doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.docx`
+        const filePath = `/doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.docx`
         await fs.writeFile(filePath, docxRes);
         const docsFile = await fs.readFile(filePath);
         blob = await put(`papers/${fileId}.docx`, docsFile, {
@@ -228,7 +227,7 @@ export async function downloadFile(fileId, fileType, filePath = null) {
         await fs.unlink(filePath);
     } else if (fileType === '.rtf') {
         const RTF_Res = await convertHtmlToRtf(file.fileData);
-        const filePath = `doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.rtf`
+        const filePath = `/doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.rtf`
         await fs.writeFile(filePath, RTF_Res);
         const rtfFile = await fs.readFile(filePath);
         blob = await put(`papers/${fileId}.rtf`, rtfFile, {

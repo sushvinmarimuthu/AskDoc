@@ -26,6 +26,7 @@ export default function DownloadButton({fileData, fileId, userId, fileTitle, upd
 
     async function handleDownloadFile(fileType) {
         handleDownloadClose();
+        await handleFileUpdate(fileId, fileData);
         if (fileType === '.pdf') {
             const filePath = `doc_${updatedAt.getTime()}_${fileTitle.replace(' ', '_')}.pdf`
             let opt = {
@@ -48,7 +49,6 @@ export default function DownloadButton({fileData, fileId, userId, fileTitle, upd
             a.click();
             document.body.removeChild(a);
         } else {
-            await handleFileUpdate(fileId, fileData);
             await downloadFile(fileId, fileType, userId).then((response) => {
                 const link = document.createElement("a");
                 link.href = response;
