@@ -68,8 +68,8 @@ export default function ToolsButton({getSelectionText, setSourceLang, setTargetL
             >
                 <ListItem
                     secondaryAction={
-                        <IconButton edge="end" aria-label="comments">
-                            <SettingsIcon onClick={handleTranslationClick}/>
+                        <IconButton edge="end" aria-label="comments" onClick={handleTranslationClick}>
+                            <SettingsIcon/>
                         </IconButton>
                     }
                     disablePadding

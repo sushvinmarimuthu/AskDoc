@@ -16,6 +16,7 @@ import fs from "fs/promises";
 import htmlToDocx from "html-to-docx"; //TODO: Deprecated, Replace with updated Packages.
 import _ from "lodash";
 import {put} from "@vercel/blob";
+import html2pdf from "html2pdf.js/src";
 
 async function getRTF(fileText) {
     return await new Promise((resolve, reject) => {
@@ -148,15 +149,33 @@ export async function saveFileData(formData) {
     const fileData = formData.get('fileData');
     const fileId = formData.get('fileId');
 
-    const file = await Paper.findOne({_id: new ObjectId(fileId)})
-    if (file) {
-        file.fileData = fileData
-        file.size = fileData.length
-        file.description = fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description';
-        file.markModified('size');
-        file.markModified('description');
-        file.save()
-    }
+    // const file = await Paper.findOne({_id: new ObjectId(fileId)})
+    // if (file) {
+    //     await Paper.updateOne({_id: new ObjectId(fileId)}, {
+    //         fileData: fileData,
+    //         size: fileData.length,
+    //         description: fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description'
+    //     })s
+    // }
+
+    await Paper.findOneAndUpdate({_id: new ObjectId(fileId)},
+        {
+            fileData: fileData,
+            size: fileData.length,
+            description: fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description'
+        })
+        // .then(() => {
+        //     console.log("File Data Updated")
+        // })
+
+    // if (file) {
+    //     file.fileData = fileData
+    //     file.size = fileData.length
+    //     file.description = fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description';
+    //     file.markModified('size');
+    //     file.markModified('description');
+    //     file.save()
+    // }
     // revalidatePath('/')
 }
 
@@ -193,7 +212,7 @@ export async function textTranslation(formData) {
     return result;
 }
 
-export async function downloadFile(fileId, fileType, userId) {
+export async function downloadFile(fileId, fileType, filePath = null) {
     await connectDB();
 
     const file = await Paper.findOne({_id: new ObjectId(fileId)});
@@ -216,18 +235,7 @@ export async function downloadFile(fileId, fileType, userId) {
             access: 'public',
         });
         await fs.unlink(filePath);
-    } else if (fileType === '.txt') {
-        const txt_res = file.fileData.replace(/<[^>]+>/g, '');
-        const filePath = `doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.txt`
-        await fs.writeFile(filePath, txt_res);
-        const txtFile = await fs.readFile(filePath);
-        blob = await put(`papers/${fileId}.txt`, txtFile, {
-            access: 'public',
-        });
-        await fs.unlink(filePath);
     }
-    console.log("Link - ", blob.url)
-    console.log("Link sliced - ", blob.url.slice(blob.url.lastIndexOf('/') + 1))
     return blob.url;
 }
 

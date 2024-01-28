@@ -4,8 +4,9 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import React, {useState} from "react";
 import {downloadFile, saveFileData} from "@/app/lib/FileActions";
+import html2pdf from "html2pdf.js/src";
 
-export default function DownloadButton({fileData, fileId, userId}) {
+export default function DownloadButton({fileData, fileId, userId, fileTitle, updatedAt}) {
     const [anchorDownloadEl, setAnchorDownloadEl] = useState(null);
     const openDownload = Boolean(anchorDownloadEl);
     const handleDownloadClick = (event) => {
@@ -25,13 +26,36 @@ export default function DownloadButton({fileData, fileId, userId}) {
 
     async function handleDownloadFile(fileType) {
         handleDownloadClose();
-        await handleFileUpdate(fileId, fileData);
-        await downloadFile(fileId, fileType, userId).then((response) => {
-            const link = document.createElement("a");
-            link.href = response;
-            link.download = response.slice(response.lastIndexOf('/') + 1);
-            link.click();
-        })
+        if (fileType === '.pdf') {
+            const filePath = `doc_${updatedAt.getTime()}_${fileTitle.replace(' ', '_')}.pdf`
+            let opt = {
+                margin: 1,
+                filename: filePath,
+                image: {type: 'jpeg', quality: 0.98},
+                html2canvas: {scale: 2},
+                jsPDF: {unit: 'in', format: 'letter', orientation: 'portrait'}
+            };
+
+            await html2pdf(fileData, opt);
+        } else if (fileType === '.txt') {
+            const filePath = `doc_${updatedAt.getTime()}_${fileTitle.replace(' ', '_')}.txt`
+            const blob = new Blob([fileData.replace(/<[^>]+>/g, '')], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filePath;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else {
+            await handleFileUpdate(fileId, fileData);
+            await downloadFile(fileId, fileType, userId).then((response) => {
+                const link = document.createElement("a");
+                link.href = response;
+                link.download = response.slice(response.lastIndexOf('/') + 1);
+                link.click();
+            })
+        }
     }
 
     return (
@@ -63,10 +87,10 @@ export default function DownloadButton({fileData, fileId, userId}) {
                     (.docx)</MenuItem>
                 <MenuItem onClick={() => handleDownloadFile('.rtf')}>Rich Text Format
                     (.rtf)</MenuItem>
-                {/*<MenuItem onClick={() => handleDownloadFile('.pdf')}>PDF Document*/}
-                {/*    (.pdf)</MenuItem>*/}
-                {/*<MenuItem onClick={() => handleDownloadFile('.txt')}>Plain Text*/}
-                {/*    (.txt)</MenuItem>*/}
+                <MenuItem onClick={() => handleDownloadFile('.pdf')}>PDF Document
+                    (.pdf)</MenuItem>
+                <MenuItem onClick={() => handleDownloadFile('.txt')}>Plain Text
+                    (.txt)</MenuItem>
             </Menu>
         </>
     );

@@ -10,32 +10,8 @@ import Box from "@mui/material/Box";
 import Splitter, {SplitDirection} from '@devbookhq/splitter'
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import {FontSize, LinkBubbleMenuHandler, ResizableImage} from "mui-tiptap";
-import {Document} from "@tiptap/extension-document";
-import {useEditor} from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import Superscript from "@tiptap/extension-superscript";
-import Subscript from "@tiptap/extension-subscript";
-import {TextStyle} from "@tiptap/extension-text-style";
-import FontFamily from "@tiptap/extension-font-family";
-import TextAlign from "@tiptap/extension-text-align";
-import TaskList from "@tiptap/extension-task-list";
-import TaskItem from "@tiptap/extension-task-item";
-import Table from "@tiptap/extension-table";
-import TableRow from "@tiptap/extension-table-row";
-import TableHeader from "@tiptap/extension-table-header";
-import TableCell from "@tiptap/extension-table-cell";
-import {Collaboration} from "@tiptap/extension-collaboration";
-import Placeholder from '@tiptap/extension-placeholder';
-import {CollaborationCursor} from "@tiptap/extension-collaboration-cursor";
 import EditorToolbar from "@/app/components/Editor/EditorToolbar";
-import {Highlight} from "@tiptap/extension-highlight";
-import {Color} from "@tiptap/extension-color";
-import {Link} from "@tiptap/extension-link";
-import * as Y from "yjs";
-import {getFile, saveFileData} from "@/app/lib/FileActions";
-import {TiptapCollabProvider} from "@hocuspocus/provider";
+import {getFile} from "@/app/lib/FileActions";
 import EditorPreviewComp from "@/app/components/Editor/EditorPreviewComp";
 
 const FileEditor = dynamic(() => import('@/app/components/File/FileEditor'), {
@@ -48,72 +24,15 @@ const FilePreview = dynamic(() => import('@/app/components/File/FilePreview'), {
     loading: () => <Skeleton variant="rectangular"/>,
 })
 
-const doc = new Y.Doc();
-const provider = new TiptapCollabProvider({
-    appId: '7j9y6m10',
-    document: doc,
-})
-
 export default function Editor(props) {
-    const {fileId, userId, searchParams, user, file, fileAccess, files, owner, fileSharedUsers} = props;
+    const {fileId, userId, searchParams, user, file, fileAccess, files, owner, fileSharedUsers, editor, fileData, doc} = props;
 
-    const [fileData, setFileData] = useState(file.fileData);
     const [fileSaved, setFileSaved] = useState(true);
     const [previewFile, setPreviewFile] = useState(null);
 
-    provider.name = fileId;
-
-    const editor = useEditor({
-        extensions: [
-            Document,
-            StarterKit.configure({history: false}),
-            Underline, Superscript, Subscript, TextStyle, FontFamily,
-            TextAlign.configure({
-                types: ['heading', 'paragraph'],
-            }),
-            TaskList,
-            TaskItem.configure({
-                nested: true,
-            }),
-            FontSize,
-            Table.configure({
-                resizable: true,
-            }),
-            TableRow,
-            TableHeader,
-            TableCell,
-            ResizableImage.configure({
-                inline: true,
-                allowBase64: true,
-            }),
-            Color.configure({
-                types: ['textStyle'],
-            }),
-            Highlight.configure({
-                multicolor: true,
-            }),
-            LinkBubbleMenuHandler,
-            Link.configure({
-                protocols: ['ftp', 'mailto'],
-            }),
-            Collaboration.configure({
-                document: doc,
-            }),
-            CollaborationCursor.configure({
-                provider: provider,
-                user: {
-                    name: user.name,
-                    color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-                },
-            }),
-            Placeholder.configure({
-                placeholder:
-                    'Write something...',
-            }),
-        ],
-        editable: (fileAccess && file.type !== 'application/pdf'),
-        autofocus: true,
-    });
+    editor.on('create', ({editor}) => {
+        editor.commands.setContent(fileData)
+    })
 
     async function handlePreviewFile(previewId) {
         await getFile(previewId).then((response) => {
@@ -121,38 +40,26 @@ export default function Editor(props) {
         })
     }
 
-    async function handleFileUpdate(fileData) {
-        setFileSaved(false)
-        const formData = new FormData();
-        formData.append('fileData', fileData);
-        formData.append('fileId', fileId);
+    // useEffect(() => {
+    //     if (!fileSaved) {
+    //         const interval = setInterval(() => {
+    //             setFileSaved(true);
+    //         }, 3000);
+    //
+    //         return () => clearInterval(interval);
+    //     }
+    // }, [fileSaved]);
 
-        await saveFileData(formData);
-    }
-
-    useEffect(() => {
-        if (!fileSaved) {
-            const interval = setInterval(() => {
-                setFileSaved(true);
-            }, 3000);
-
-            return () => clearInterval(interval);
-        }
-    }, [fileSaved]);
-
-    useEffect(() => {
-        if (editor && file) {
-            editor.commands.setContent(file.type !== 'application/pdf' && fileData);
-            if (editor.getHTML()) {
-                editor.on('update', async ({editor}) => {
-                    setFileData(editor.getHTML());
-                    if (file.type !== 'application/pdf') {
-                        await handleFileUpdate(editor.getHTML());
-                    }
-                })
-            }
-        }
-    }, [editor, file]);
+    // useEffect(() => {
+    //     if (editor && editor.getHTML()) {
+    //         editor.on('update', async ({editor}) => {
+    //             setFileData(editor.getHTML());
+    //             if (file.type !== 'application/pdf') {
+    //                 await handleFileUpdate(editor.getHTML());
+    //             }
+    //         })
+    //     }
+    // }, [editor, file.type]);
 
     return (
         <>

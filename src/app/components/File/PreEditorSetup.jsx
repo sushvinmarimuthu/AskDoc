@@ -1,4 +1,9 @@
-import {FontSize, LinkBubbleMenuHandler, ResizableImage, RichTextEditorProvider, RichTextField} from "mui-tiptap";
+"use client";
+
+import '@/app/css/CustomGutter.css';
+import '@/app/css/collaboration.css';
+
+import {FontSize, LinkBubbleMenuHandler, ResizableImage} from "mui-tiptap";
 import {Document} from "@tiptap/extension-document";
 import {useEditor} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -16,19 +21,39 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
 import {Collaboration} from "@tiptap/extension-collaboration";
 import Placeholder from '@tiptap/extension-placeholder';
-import {CollaborationCursor} from "@tiptap/extension-collaboration-cursor";
 import {Highlight} from "@tiptap/extension-highlight";
 import {Color} from "@tiptap/extension-color";
 import {Link} from "@tiptap/extension-link";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import Box from "@mui/material/Box";
+import * as Y from "yjs";
+import {TiptapCollabProvider} from "@hocuspocus/provider";
+import Editor from "@/app/components/File/Editor";
+import {useState} from "react";
+import {saveFileData} from "@/app/lib/FileActions";
+import {CollaborationCursor} from "@tiptap/extension-collaboration-cursor";
 
+const ydoc = new Y.Doc();
+const provider = new TiptapCollabProvider({
+    appId: '7j9y6m10',
+    document: ydoc,
+})
 
-export default function EditorPreviewComp({doc}) {
+async function handleFileUpdate(fileData, fileId) {
+    // setFileSaved(false)
+    const formData = new FormData();
+    formData.append('fileData', fileData);
+    formData.append('fileId', fileId);
+
+    await saveFileData(formData);
+}
+
+export default function PreEditorSetup(props) {
+    const {fileId, userId, searchParams, user, file, fileAccess, files, owner, fileSharedUsers} = props;
+    provider.name = fileId;
+
+    const [fileData, setFileData] = useState(file.fileData);
+
     const editor = useEditor({
         extensions: [
-            Document,
             StarterKit.configure({history: false}),
             Underline, Superscript, Subscript, TextStyle, FontFamily,
             TextAlign.configure({
@@ -60,34 +85,39 @@ export default function EditorPreviewComp({doc}) {
                 protocols: ['ftp', 'mailto'],
             }),
             Collaboration.configure({
-                document: doc,
+                document: ydoc,
+            }),
+            CollaborationCursor.configure({
+                provider: provider,
+                user: {
+                    name: user.name,
+                    color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+                },
             }),
             Placeholder.configure({
                 placeholder:
                     'Write something...',
             }),
         ],
-        // editable: false,
         autofocus: true,
-        // onUpdate({editor}) {
-        //     console.log(editor.getHTML())
-        // },
+
+        async onUpdate({editor}) {
+            console.log("Updated...")
+            setFileData(editor.getHTML());
+            if (file.type !== 'application/pdf') {
+                await handleFileUpdate(editor.getHTML(), fileId).then(() => {
+                    console.log("File saved...")
+                });
+            }
+        }
     });
+
 
     return (
         <>
-            <Typography variant={'h6'} sx={{textAlign: 'center', fontWeight: 'bold'}}>
-                Preview
-            </Typography>
-            <Divider/>
-            <Box sx={{
-                    overflow: "hidden",
-                    overflowY: "scroll",
-                }}>
-                <RichTextEditorProvider editor={editor}>
-                    <RichTextField variant={'standard'} style={{minHeight: '100vh'}}/>
-                </RichTextEditorProvider>
-            </Box>
+            {editor && <Editor userId={userId} fileId={fileId} searchParams={searchParams} editor={editor}
+                               user={user} file={file} fileAccess={fileAccess} files={files} owner={owner}
+                               fileSharedUsers={fileSharedUsers} fileData={fileData} doc={ydoc}/>}
         </>
-    )
+    );
 }

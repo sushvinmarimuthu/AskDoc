@@ -28,7 +28,7 @@ import {createFile, textTranslation} from "@/app/lib/FileActions";
 export default function EditorToolbar(props) {
     let {editor, fileAccess, fileId, userId, fileSaved, file, files, owner, fileSharedUsers, handlePreviewFile} = props;
     const [sourceLang, setSourceLang] = useState('eng');
-    const [targetLang, setTargetLang] = useState(null);
+    const [targetLang, setTargetLang] = useState('');
     const router = useRouter();
 
     async function getSelectionText(action) {
@@ -113,6 +113,7 @@ export default function EditorToolbar(props) {
                                 }}
                                 id="files"
                                 options={files}
+                                isOptionEqualToValue={(option, value) => option.value === value.value}
                                 sx={{width: 300, p: 1}}
                                 renderInput={(params) => <TextField {...params} label="Preview File"/>}
                             />
@@ -128,6 +129,7 @@ export default function EditorToolbar(props) {
                                 }}
                                 id="files"
                                 options={files}
+                                isOptionEqualToValue={(option, value) => option.value === value.value}
                                 sx={{width: 300, p: 1}}
                                 renderInput={(params) => <TextField {...params} label="Editor File"/>}
                             />
@@ -207,7 +209,8 @@ export default function EditorToolbar(props) {
                             />
 
                             <DownloadButton fileData={editor.getHTML()}
-                                            fileId={fileId} userId={userId}/>
+                                            fileId={fileId} userId={userId} fileTitle={file.title}
+                                            updatedAt={file.updatedAt}/>
 
                             <Tooltip title="Create new document" disableFocusListener disableTouchListener>
                                 <Button variant={'contained'} size={'small'} onClick={handleNewClick}>New</Button>

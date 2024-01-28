@@ -6,6 +6,7 @@ import React, {Suspense} from "react";
 import {getSharedUsers, getUserFiles} from "@/app/lib/FileActions";
 import Editor from "@/app/components/File/Editor";
 import {notFound} from "next/navigation";
+import PreEditorSetup from "@/app/components/File/PreEditorSetup";
 
 export default async function FileEditorPreviewPage({params, searchParams}) {
     const fileId = params.fileId;
@@ -31,11 +32,11 @@ export default async function FileEditorPreviewPage({params, searchParams}) {
 
     return (
         <Suspense fallback={<Loading/>}>
-            <Editor
+            {file && <PreEditorSetup
                 userId={userId} fileId={fileId} searchParams={searchParams}
                 user={user} file={file} fileAccess={fileAccess} files={files} owner={owner}
                 fileSharedUsers={fileSharedUsers}
-            />
+            />}
         </Suspense>
     );
 }
