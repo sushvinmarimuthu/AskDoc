@@ -33,7 +33,7 @@ import {CollaborationCursor} from "@tiptap/extension-collaboration-cursor";
 
 const ydoc = new Y.Doc();
 const provider = new TiptapCollabProvider({
-    appId: '7j9y6m10',
+    appId: 'v9107wmo',
     document: ydoc,
 })
 
