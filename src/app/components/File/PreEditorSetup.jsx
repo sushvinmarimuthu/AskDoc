@@ -98,7 +98,7 @@ export default function PreEditorSetup(props) {
             console.log("Updated...")
             setFileData(editor.getHTML());
             if (file.type !== 'application/pdf') {
-                await handleFileUpdate(fileData, fileId).then(() => {
+                await handleFileUpdate(editor.getHTML(), fileId).then(() => {
                     console.log("File saved...")
                 });
             }
