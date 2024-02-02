@@ -13,7 +13,7 @@ export default async function NavBar({userId}) {
         <AppBar position="static" color="inherit"
                 sx={{mt: 2, borderRadius: 5, width: '100%', boxShadow: 2, height: '65px'}}>
             <Toolbar disableGutters>
-                <Avatar sx={{m: 1, width: 50, height: 50}} src={'/LOGO.png'}/>
+                <Avatar sx={{m: 1, width: 50, height: 50}} src={'/LOGO.jpg'}/>
                 <Typography
                     variant="h6"
                     noWrap

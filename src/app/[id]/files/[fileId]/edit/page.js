@@ -4,7 +4,6 @@ import {checkFileAccess} from "@/app/lib/files";
 import Loading from "@/app/[id]/loading";
 import React, {Suspense} from "react";
 import {getSharedUsers, getUserFiles} from "@/app/lib/FileActions";
-import Editor from "@/app/components/File/Editor";
 import {notFound} from "next/navigation";
 import PreEditorSetup from "@/app/components/File/PreEditorSetup";
 

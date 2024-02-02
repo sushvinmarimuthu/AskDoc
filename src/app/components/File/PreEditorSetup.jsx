@@ -28,9 +28,7 @@ import Editor from "@/app/components/File/Editor";
 import {useState} from "react";
 import {saveFileData} from "@/app/lib/FileActions";
 
-
 async function handleFileUpdate(fileData, fileId) {
-    // setFileSaved(false)
     const formData = new FormData();
     formData.append('fileData', fileData);
     formData.append('fileId', fileId);
@@ -39,8 +37,8 @@ async function handleFileUpdate(fileData, fileId) {
 }
 
 export default function PreEditorSetup(props) {
-    const ydoc = new Y.Doc();
     const {fileId, userId, searchParams, user, file, fileAccess, files, owner, fileSharedUsers} = props;
+    const yDoc = new Y.Doc();
 
     const [fileData, setFileData] = useState(file.fileData);
 
@@ -77,7 +75,7 @@ export default function PreEditorSetup(props) {
                 protocols: ['ftp', 'mailto'],
             }),
             Collaboration.configure({
-                document: ydoc,
+                document: yDoc,
             }),
             // CollaborationCursor.configure({
             //     provider: provider,
@@ -109,7 +107,7 @@ export default function PreEditorSetup(props) {
         <>
             {editor && <Editor userId={userId} fileId={fileId} searchParams={searchParams} editor={editor}
                                user={user} file={file} fileAccess={fileAccess} files={files} owner={owner}
-                               fileSharedUsers={fileSharedUsers} fileData={fileData} ydoc={ydoc}/>}
+                               fileSharedUsers={fileSharedUsers} fileData={fileData} ydoc={yDoc}/>}
         </>
     );
 }
