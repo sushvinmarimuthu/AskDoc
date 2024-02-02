@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 6060",
     "build": "next build",
-    "start": "next start & npx @hocuspocus/cli port --1234",
+    "start": "next start -p 6060 & npx @hocuspocus/cli port --1234",
     "lint": "next lint"
   },
   "dependencies": {
