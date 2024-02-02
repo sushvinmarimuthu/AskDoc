@@ -15,17 +15,15 @@ import TableRow from "@tiptap/extension-table-row";
 import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
 import {Collaboration} from "@tiptap/extension-collaboration";
-import Placeholder from '@tiptap/extension-placeholder';
-import {CollaborationCursor} from "@tiptap/extension-collaboration-cursor";
 import {Highlight} from "@tiptap/extension-highlight";
 import {Color} from "@tiptap/extension-color";
 import {Link} from "@tiptap/extension-link";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
+import {useEffect} from "react";
 
 
-export default function EditorPreviewComp({doc}) {
+export default function EditorPreviewComp({ydoc, fileData}) {
+
     const editor = useEditor({
         extensions: [
             Document,
@@ -60,30 +58,24 @@ export default function EditorPreviewComp({doc}) {
                 protocols: ['ftp', 'mailto'],
             }),
             Collaboration.configure({
-                document: doc,
-            }),
-            Placeholder.configure({
-                placeholder:
-                    'Write something...',
+                document: ydoc,
             }),
         ],
-        // editable: false,
-        autofocus: true,
-        // onUpdate({editor}) {
-        //     console.log(editor.getHTML())
-        // },
+        content: fileData,
     });
+
+    useEffect(() => {
+        if (editor && fileData) {
+            editor.commands.setContent(fileData)
+        }
+    }, [fileData]);
 
     return (
         <>
-            <Typography variant={'h6'} sx={{textAlign: 'center', fontWeight: 'bold'}}>
-                Preview
-            </Typography>
-            <Divider/>
             <Box sx={{
-                    overflow: "hidden",
-                    overflowY: "scroll",
-                }}>
+                overflow: "hidden",
+                overflowY: "scroll",
+            }}>
                 <RichTextEditorProvider editor={editor}>
                     <RichTextField variant={'standard'} style={{minHeight: '100vh'}}/>
                 </RichTextEditorProvider>

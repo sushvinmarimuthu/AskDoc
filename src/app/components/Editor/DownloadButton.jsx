@@ -6,7 +6,7 @@ import React, {useState} from "react";
 import {downloadFile, saveFileData} from "@/app/lib/FileActions";
 import html2pdf from "html2pdf.js/src";
 
-export default function DownloadButton({fileData, fileId, userId, fileTitle, updatedAt}) {
+export default function DownloadButton({fileData, fileId, fileTitle, updatedAt}) {
     const [anchorDownloadEl, setAnchorDownloadEl] = useState(null);
     const openDownload = Boolean(anchorDownloadEl);
     const handleDownloadClick = (event) => {
@@ -49,7 +49,7 @@ export default function DownloadButton({fileData, fileId, userId, fileTitle, upd
             a.click();
             document.body.removeChild(a);
         } else {
-            await downloadFile(fileId, fileType, userId).then((response) => {
+            await downloadFile(fileId, fileType).then((response) => {
                 const link = document.createElement("a");
                 link.href = response;
                 link.download = response.slice(response.lastIndexOf('/') + 1);

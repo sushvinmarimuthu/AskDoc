@@ -26,7 +26,7 @@ import IconButton from "@mui/material/IconButton";
 import {createFile, textTranslation} from "@/app/lib/FileActions";
 
 export default function EditorToolbar(props) {
-    let {editor, fileAccess, fileId, userId, fileSaved, file, files, owner, fileSharedUsers, handlePreviewFile} = props;
+    let {editor, fileAccess, fileId, userId, fileSaved, file, files, owner, fileSharedUsers, handlePreviewFile, ydoc} = props;
     const [sourceLang, setSourceLang] = useState('eng');
     const [targetLang, setTargetLang] = useState('');
     const router = useRouter();
@@ -90,6 +90,11 @@ export default function EditorToolbar(props) {
 
     const openNew = Boolean(anchorNewEl);
 
+    function handleRedirect() {
+        ydoc.destroy();
+        router.push(`/${userId}/home`);
+    }
+
 
     return (
         editor &&
@@ -99,7 +104,7 @@ export default function EditorToolbar(props) {
                     <Stack spacing={1} direction="row" justifyContent="space-between" alignItems="center">
                         <Stack direction={'row'}>
                             <Tooltip title="Back to home" disableFocusListener disableTouchListener>
-                                <IconButton size={"small"} onClick={() => router.push(`/${userId}/home`)}>
+                                <IconButton size={"small"} onClick={handleRedirect}>
                                     <ArrowBackIcon/>
                                 </IconButton>
                             </Tooltip>
@@ -113,7 +118,7 @@ export default function EditorToolbar(props) {
                                 }}
                                 id="files"
                                 options={files}
-                                isOptionEqualToValue={(option, value) => option.value === value.value}
+                                isOptionEqualToValue={(option, value) => option.label === value.label}
                                 sx={{width: 300, p: 1}}
                                 renderInput={(params) => <TextField {...params} label="Preview File"/>}
                             />
@@ -129,7 +134,7 @@ export default function EditorToolbar(props) {
                                 }}
                                 id="files"
                                 options={files}
-                                isOptionEqualToValue={(option, value) => option.value === value.value}
+                                isOptionEqualToValue={(option, value) => option.label === value.label}
                                 sx={{width: 300, p: 1}}
                                 renderInput={(params) => <TextField {...params} label="Editor File"/>}
                             />

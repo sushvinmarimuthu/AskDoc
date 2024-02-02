@@ -11,7 +11,6 @@ import {PDFDocument} from "pdf-lib";
 import Paper from "@/app/models/Paper";
 import {NextResponse} from "next/server";
 import {revalidatePath} from "next/cache";
-import path from "path";
 import fs from "fs/promises";
 import htmlToDocx from "html-to-docx"; //TODO: Deprecated, Replace with updated Packages.
 import _ from "lodash";
@@ -148,34 +147,13 @@ export async function saveFileData(formData) {
     const fileData = formData.get('fileData');
     const fileId = formData.get('fileId');
 
-    // const file = await Paper.findOne({_id: new ObjectId(fileId)})
-    // if (file) {
-    //     await Paper.updateOne({_id: new ObjectId(fileId)}, {
-    //         fileData: fileData,
-    //         size: fileData.length,
-    //         description: fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description'
-    //     })s
-    // }
-
     await Paper.findOneAndUpdate({_id: new ObjectId(fileId)},
         {
             fileData: fileData,
             size: fileData.length,
             description: fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description'
         })
-    // .then(() => {
-    //     console.log("File Data Updated")
-    // })
-
-    // if (file) {
-    //     file.fileData = fileData
-    //     file.size = fileData.length
-    //     file.description = fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description';
-    //     file.markModified('size');
-    //     file.markModified('description');
-    //     file.save()
-    // }
-    // revalidatePath('/')
+    revalidatePath('/')
 }
 
 export async function getUserFiles(userId) {
@@ -211,30 +189,23 @@ export async function textTranslation(formData) {
     return result;
 }
 
-export async function downloadFile(fileId, fileType, filePath = null) {
+export async function downloadFile(fileId, fileType) {
     await connectDB();
 
     const file = await Paper.findOne({_id: new ObjectId(fileId)});
-    let blob;
+    let blob, downFile, buffRes;
+    const filePath = `doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.${fileType === '.docx' ? 'docx' : 'rtf'}`;
     if (fileType === '.docx') {
-        const docxRes = await htmlToDocx(file.fileData, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-        const filePath = `/doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.docx`
-        await fs.writeFile(filePath, docxRes);
-        const docsFile = await fs.readFile(filePath);
-        blob = await put(`papers/${fileId}.docx`, docsFile, {
-            access: 'public',
-        })
-        await fs.unlink(filePath);
+        buffRes = await htmlToDocx(file.fileData, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
     } else if (fileType === '.rtf') {
-        const RTF_Res = await convertHtmlToRtf(file.fileData);
-        const filePath = `/doc_${file.updatedAt.getTime()}_${file.title.replace(' ', '_')}.rtf`
-        await fs.writeFile(filePath, RTF_Res);
-        const rtfFile = await fs.readFile(filePath);
-        blob = await put(`papers/${fileId}.rtf`, rtfFile, {
-            access: 'public',
-        });
-        await fs.unlink(filePath);
+        buffRes = await convertHtmlToRtf(file.fileData);
     }
+    await fs.writeFile(filePath, buffRes);
+    downFile = await fs.readFile(filePath);
+    blob = await put(`papers/${filePath}`, downFile, {
+        access: 'public',
+    })
+    await fs.unlink(filePath);
     return blob.url;
 }
 
