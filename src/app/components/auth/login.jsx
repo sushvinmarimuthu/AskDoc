@@ -68,15 +68,17 @@ export default function Login() {
         await signIn('credentials',
             {
                 ...userCredentials,
-            }).then((response) => {
-            if (response?.error) {
-                toast.error(response?.error);
+                redirect: false,
+            })
+            .then((response) => {
+                if (response?.error) {
+                    toast.error(response?.error);
+                } else {
+                    toast.success("Logged in successfully.")
+                    router.push('/')
+                }
                 setLoading(false)
-            } else {
-                toast.success("Logged in successfully.")
-                setLoading(false)
-            }
-        })
+            })
     }
 
     return (

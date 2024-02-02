@@ -70,7 +70,7 @@ export const authOptions = {
     pages: {
         signIn: '/auth/login',
         signOut: '/auth/login',
-        error: '/auth/login/error',
+        error: '/auth/error',
     },
     callbacks: {
         async signIn({user, account, profile}) {
