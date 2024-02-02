@@ -74,8 +74,8 @@ export default function Login() {
                 if (response?.error) {
                     toast.error(response?.error);
                 } else {
-                    toast.success("Logged in successfully.")
                     router.push('/')
+                    toast.success("Logged in successfully.")
                 }
                 setLoading(false)
             })
