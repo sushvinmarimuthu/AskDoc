@@ -125,7 +125,8 @@ export async function createFile(formData) {
         sharedUsers: []
     })
 
-    return await fileResult._id;
+    const fileId = await fileResult._id;
+    return JSON.parse(JSON.stringify(fileId));
 }
 
 export async function renameFile(formData) {
@@ -153,7 +154,7 @@ export async function saveFileData(formData) {
             size: fileData.length,
             description: fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description'
         })
-    revalidatePath('/')
+    // revalidatePath('/')
 }
 
 export async function getUserFiles(userId) {
@@ -161,12 +162,13 @@ export async function getUserFiles(userId) {
     const ownedByMe = await Paper.find({"owner.id": {"$eq": userId}}).sort({updatedAt: -1})
     const sharedWithMe = await Paper.find({"sharedUsers._id": {"$eq": userId}}).sort({updatedAt: -1});
 
-    return [ownedByMe, sharedWithMe]
+    return JSON.parse(JSON.stringify([ownedByMe, sharedWithMe]))
 }
 
 export async function getFile(fileId) {
     await connectDB();
-    return Paper.findOne({_id: new ObjectId(fileId)});
+    const paper = await Paper.findOne({_id: new ObjectId(fileId)});
+    return JSON.parse(JSON.stringify(paper));
 }
 
 export async function textTranslation(formData) {
@@ -270,5 +272,5 @@ export async function getSharedUsers(fileId) {
         })
     }
 
-    return result;
+    return JSON.parse(JSON.stringify(result));
 }

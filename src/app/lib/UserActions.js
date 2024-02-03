@@ -3,8 +3,6 @@
 import connectDB from "@/app/lib/mongodb";
 import User from "@/app/models/User";
 import {ObjectId} from "mongodb";
-import path from "path";
-import fs from "fs/promises";
 import {revalidatePath} from "next/cache";
 import bcrypt from "bcrypt";
 import {registerPasswordValidator, resetPasswordValidator} from "@/app/lib/users";
@@ -166,10 +164,12 @@ export async function getUserEmail(email, ownerId) {
     result.map((data) => {
         emails.push({value: data._id.toString(), label: data.email});
     })
-    return emails;
+    return JSON.parse(JSON.stringify(emails));
 }
 
 
 export async function getUser(userId) {
-    return User.findOne({_id: new ObjectId(userId)});
+    const user = await User.findOne({_id: new ObjectId(userId)});
+    return JSON.parse(JSON.stringify(user));
+
 }

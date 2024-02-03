@@ -11,13 +11,16 @@ export default async function FileEditorPreviewPage({params, searchParams}) {
     const fileId = params.fileId;
     const userId = params.id;
 
-    const user = await User.findOne({_id: userId})
-    const file = await Paper.findOne({_id: fileId})
+    let user = await User.findOne({_id: userId})
+    user = JSON.parse(JSON.stringify(user))
+    let file = await Paper.findOne({_id: fileId})
     if (!file) {
         return notFound()
     }
+    file = JSON.parse(JSON.stringify(file))
 
-    const owner = await User.findOne({_id: file.owner.id})
+    let owner = await User.findOne({_id: file.owner.id})
+    owner = JSON.parse(JSON.stringify(owner))
 
     const fileAccess = await checkFileAccess(file, userId);
     const userFiles = await getUserFiles(userId);

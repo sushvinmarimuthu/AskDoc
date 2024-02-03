@@ -33,7 +33,7 @@ export async function checkFileAccess(file, userId) {
             }
         }
     }
-    return access;
+    return JSON.parse(JSON.stringify(access));
 }
 
 async function uint8ArrayToDataURI(uint8Array, mimeType) {
