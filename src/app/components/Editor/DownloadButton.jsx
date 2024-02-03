@@ -7,6 +7,7 @@ import {downloadFile, saveFileData} from "@/app/lib/FileActions";
 import html2pdf from "html2pdf.js/src";
 
 export default function DownloadButton({fileData, fileId, fileTitle, updatedAt}) {
+    const [isLoading, setIsLoading] = useState(false);
     const [anchorDownloadEl, setAnchorDownloadEl] = useState(null);
     const openDownload = Boolean(anchorDownloadEl);
     const handleDownloadClick = (event) => {
@@ -25,10 +26,11 @@ export default function DownloadButton({fileData, fileId, fileTitle, updatedAt})
     }
 
     async function handleDownloadFile(fileType) {
+        setIsLoading(true)
         handleDownloadClose();
         await handleFileUpdate(fileId, fileData);
         if (fileType === '.pdf') {
-            const filePath = `doc_${updatedAt.getTime()}_${fileTitle.replace(' ', '_')}.pdf`
+            const filePath = `doc_${new Date(updatedAt).getTime()}_${fileTitle.replace(' ', '_')}.pdf`
             let opt = {
                 margin: 1,
                 filename: filePath,
@@ -39,7 +41,7 @@ export default function DownloadButton({fileData, fileId, fileTitle, updatedAt})
 
             await html2pdf(fileData, opt);
         } else if (fileType === '.txt') {
-            const filePath = `doc_${updatedAt.getTime()}_${fileTitle.replace(' ', '_')}.txt`
+            const filePath = `doc_${new Date(updatedAt).getTime()}_${fileTitle.replace(' ', '_')}.txt`
             const blob = new Blob([fileData.replace(/<[^>]+>/g, '')], {type: 'text/plain'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -56,6 +58,7 @@ export default function DownloadButton({fileData, fileId, fileTitle, updatedAt})
                 link.click();
             })
         }
+        setIsLoading(false)
     }
 
     return (
@@ -71,6 +74,7 @@ export default function DownloadButton({fileData, fileId, fileTitle, updatedAt})
                 variant={"contained"}
                 size={"small"}
                 color={"success"}
+                loading={isLoading}
             >
                 Download
             </LoadingButton>
