@@ -23,10 +23,10 @@ import Placeholder from '@tiptap/extension-placeholder';
 import {Highlight} from "@tiptap/extension-highlight";
 import {Color} from "@tiptap/extension-color";
 import {Link} from "@tiptap/extension-link";
-import * as Y from "yjs";
 import Editor from "@/app/components/File/Editor";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {saveFileData} from "@/app/lib/FileActions";
+import {CollaborationCursor} from "@tiptap/extension-collaboration-cursor";
 
 async function handleFileUpdate(fileData, fileId) {
     const formData = new FormData();
@@ -37,12 +37,19 @@ async function handleFileUpdate(fileData, fileId) {
 }
 
 export default function PreEditorSetup(props) {
-    const {fileId, userId, searchParams, user, file, fileAccess, files, owner, fileSharedUsers} = props;
-    const yDoc = new Y.Doc();
+    const {fileId, userId, searchParams, user, file, fileAccess, files, owner, fileSharedUsers, yDoc, provider} = props;
+    const [status, setStatus] = useState('Connecting...');
 
     const [fileData, setFileData] = useState(file.fileData);
 
     const editor = useEditor({
+        onCreate({editor}) {
+            provider.on("synced", () => {
+                if (editor.isEmpty) {
+                    editor.commands.setContent(fileData)
+                }
+            });
+        },
         extensions: [
             StarterKit.configure({history: false}),
             Underline, Superscript, Subscript, TextStyle, FontFamily,
@@ -77,37 +84,49 @@ export default function PreEditorSetup(props) {
             Collaboration.configure({
                 document: yDoc,
             }),
-            // CollaborationCursor.configure({
-            //     provider: provider,
-            //     user: {
-            //         name: user.name,
-            //         color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-            //     },
-            // }),
+            CollaborationCursor.configure({
+                provider: provider,
+                user: {
+                    name: user.name,
+                    color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+                },
+            }),
             Placeholder.configure({
                 placeholder:
                     'Write something...',
             }),
         ],
-        content: fileData,
         autofocus: true,
 
         async onUpdate({editor}) {
             console.log("Updated...")
             setFileData(editor.getHTML());
             if (file.type !== 'application/pdf') {
-                await handleFileUpdate(editor.getHTML(), fileId).then(() => {
-                    console.log("File saved...")
-                });
+                await handleFileUpdate(editor.getHTML(), fileId)
+                    .then(() => {
+                        console.log("File saved...")
+                    });
             }
         }
     });
+
+    useEffect(() => {
+        const statusHandler = (event) => {
+            setStatus(event.status);
+        }
+
+        provider.on("status", statusHandler);
+
+        return () => {
+            provider.off("status", statusHandler);
+        }
+    }, [provider]);
 
     return (
         <>
             {editor && <Editor userId={userId} fileId={fileId} searchParams={searchParams} editor={editor}
                                user={user} file={file} fileAccess={fileAccess} files={files} owner={owner}
-                               fileSharedUsers={fileSharedUsers} fileData={fileData} ydoc={yDoc}/>}
+                               fileSharedUsers={fileSharedUsers} fileData={fileData} ydoc={yDoc} status={status}/>}
         </>
     );
 }

@@ -6,6 +6,8 @@ import React, {Suspense} from "react";
 import {getSharedUsers, getUserFiles} from "@/app/lib/FileActions";
 import {notFound} from "next/navigation";
 import PreEditorSetup from "@/app/components/File/PreEditorSetup";
+import ProviderSetup from "@/app/components/File/ProviderSetup";
+import jsonwebtoken from "jsonwebtoken";
 
 export default async function FileEditorPreviewPage({params, searchParams}) {
     const fileId = params.fileId;
@@ -32,12 +34,18 @@ export default async function FileEditorPreviewPage({params, searchParams}) {
 
     const fileSharedUsers = await getSharedUsers(fileId);
 
+    const data = {
+        allowedDocumentNames: [fileId]
+    }
+
+    const jwt = jsonwebtoken.sign(data, 'lIoj7KJrT0e1DxQkU9sViIb9T6Zw09Z1zrfLEtNqXZAu2x7kiFddcpHgNFbxcNDj')
+
     return (
         <Suspense fallback={<Loading/>}>
-            {file && <PreEditorSetup
+            {(user && file) && <ProviderSetup
                 userId={userId} fileId={fileId} searchParams={searchParams}
                 user={user} file={file} fileAccess={fileAccess} files={files} owner={owner}
-                fileSharedUsers={fileSharedUsers}
+                fileSharedUsers={fileSharedUsers} jwt={jwt}
             />}
         </Suspense>
     );

@@ -24,9 +24,23 @@ import {useRouter} from "next/navigation";
 import FileShareModal from "@/app/components/File/FileShareModal";
 import IconButton from "@mui/material/IconButton";
 import {createFile, textTranslation} from "@/app/lib/FileActions";
+import Typography from "@mui/material/Typography";
 
 export default function EditorToolbar(props) {
-    let {editor, fileAccess, fileId, userId, fileSaved, file, files, owner, fileSharedUsers, handlePreviewFile, ydoc} = props;
+    let {
+        editor,
+        fileAccess,
+        fileId,
+        userId,
+        fileSaved,
+        file,
+        files,
+        owner,
+        fileSharedUsers,
+        handlePreviewFile,
+        ydoc,
+        status
+    } = props;
     const [sourceLang, setSourceLang] = useState('eng');
     const [targetLang, setTargetLang] = useState('');
     const router = useRouter();
@@ -118,7 +132,7 @@ export default function EditorToolbar(props) {
                                 }}
                                 id="files"
                                 options={files}
-                                isOptionEqualToValue={(option, value) => option.label === value.label}
+                                isOptionEqualToValue={(option, value) => option.label === value}
                                 sx={{width: 300, p: 1}}
                                 renderInput={(params) => <TextField {...params} label="Preview File"/>}
                             />
@@ -134,7 +148,7 @@ export default function EditorToolbar(props) {
                                 }}
                                 id="files"
                                 options={files}
-                                isOptionEqualToValue={(option, value) => option.label === value.label}
+                                isOptionEqualToValue={(option, value) => option.label === value}
                                 sx={{width: 300, p: 1}}
                                 renderInput={(params) => <TextField {...params} label="Editor File"/>}
                             />
@@ -202,6 +216,7 @@ export default function EditorToolbar(props) {
                         <MenuButtonAddTable/>
                         <TableBubbleMenu/>
                         {/*<MenuDivider/>*/}
+                        <Typography>{status}</Typography>
 
                         <Stack direction="row" spacing={1}>
                             <ToolsButton
