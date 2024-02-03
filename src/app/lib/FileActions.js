@@ -154,7 +154,6 @@ export async function saveFileData(formData) {
             size: fileData.length,
             description: fileData.replace(/<[^>]+>/g, '').substring(0, 50) || 'Description'
         })
-    // revalidatePath('/')
 }
 
 export async function getUserFiles(userId) {

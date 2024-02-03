@@ -22,7 +22,7 @@ import Box from "@mui/material/Box";
 import {useEffect} from "react";
 
 
-export default function EditorPreviewComp({ydoc, fileData}) {
+export default function EditorPreviewComp({yDoc, fileData}) {
 
     const editor = useEditor({
         extensions: [
@@ -58,7 +58,7 @@ export default function EditorPreviewComp({ydoc, fileData}) {
                 protocols: ['ftp', 'mailto'],
             }),
             Collaboration.configure({
-                document: ydoc,
+                document: yDoc,
             }),
         ],
         content: fileData,

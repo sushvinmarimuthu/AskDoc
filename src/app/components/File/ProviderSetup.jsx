@@ -4,8 +4,6 @@ import * as Y from "yjs";
 import {TiptapCollabProvider} from "@hocuspocus/provider";
 import PreEditorSetup from "@/app/components/File/PreEditorSetup";
 
-
-
 export default function ProviderSetup(props) {
     const {fileId, userId, searchParams, user, file, fileAccess, files, owner, fileSharedUsers, jwt} = props;
     const yDoc = new Y.Doc();

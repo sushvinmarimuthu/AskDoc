@@ -13,9 +13,7 @@ import Toolbar from "@mui/material/Toolbar";
 import React, {useState} from "react";
 import toast from 'react-hot-toast';
 import {TableBubbleMenu} from "mui-tiptap";
-import CloudDoneIcon from "@mui/icons-material/CloudDone";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import {LoadingButton} from "@mui/lab";
 import Tooltip from "@mui/material/Tooltip";
 import TextField from "@mui/material/TextField";
 import {Autocomplete, Popover} from "@mui/material";
@@ -24,23 +22,11 @@ import {useRouter} from "next/navigation";
 import FileShareModal from "@/app/components/File/FileShareModal";
 import IconButton from "@mui/material/IconButton";
 import {createFile, textTranslation} from "@/app/lib/FileActions";
-import Typography from "@mui/material/Typography";
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import GroupsIcon from "@mui/icons-material/Groups";
 
 export default function EditorToolbar(props) {
-    let {
-        editor,
-        fileAccess,
-        fileId,
-        userId,
-        fileSaved,
-        file,
-        files,
-        owner,
-        fileSharedUsers,
-        handlePreviewFile,
-        ydoc,
-        status
-    } = props;
+    let {editor, fileAccess, fileId, userId, file, files, owner, fileSharedUsers, handlePreviewFile, yDoc, status} = props;
     const [sourceLang, setSourceLang] = useState('eng');
     const [targetLang, setTargetLang] = useState('');
     const router = useRouter();
@@ -105,7 +91,7 @@ export default function EditorToolbar(props) {
     const openNew = Boolean(anchorNewEl);
 
     function handleRedirect() {
-        ydoc.destroy();
+        yDoc.destroy();
         router.push(`/${userId}/home`);
     }
 
@@ -116,7 +102,7 @@ export default function EditorToolbar(props) {
             <RichTextEditorProvider editor={editor}>
                 <Stack sx={{p: 1}}>
                     <Stack spacing={1} direction="row" justifyContent="space-between" alignItems="center">
-                        <Stack direction={'row'}>
+                        <Stack spacing={1} direction={'row'} alignItems="center">
                             <Tooltip title="Back to home" disableFocusListener disableTouchListener>
                                 <IconButton size={"small"} onClick={handleRedirect}>
                                     <ArrowBackIcon/>
@@ -137,7 +123,7 @@ export default function EditorToolbar(props) {
                                 renderInput={(params) => <TextField {...params} label="Preview File"/>}
                             />
                         </Stack>
-                        <Stack direction={'row'}>
+                        <Stack spacing={1} direction={'row'} alignItems="center">
                             <Autocomplete
                                 size={"small"}
                                 defaultValue={file.title}
@@ -152,10 +138,10 @@ export default function EditorToolbar(props) {
                                 sx={{width: 300, p: 1}}
                                 renderInput={(params) => <TextField {...params} label="Editor File"/>}
                             />
-                            <Tooltip title="File Saved" disableFocusListener disableTouchListener>
-                                <LoadingButton loading={!fileSaved} size={"small"}>
-                                    <CloudDoneIcon/>
-                                </LoadingButton>
+                            <Tooltip title={status === "connected" ? "Connected" : "Connecting..."} disableFocusListener
+                                     disableTouchListener>
+                                <FiberManualRecordIcon color={status === "connected" ? "success" : "error"}
+                                                       fontSize={"small"}/>
                             </Tooltip>
                         </Stack>
                     </Stack>
@@ -215,10 +201,9 @@ export default function EditorToolbar(props) {
 
                         <MenuButtonAddTable/>
                         <TableBubbleMenu/>
-                        {/*<MenuDivider/>*/}
-                        <Typography>{status}</Typography>
+                        <MenuDivider/>
 
-                        <Stack direction="row" spacing={1}>
+                        <Stack direction="row" spacing={2} alignItems={"center"}>
                             <ToolsButton
                                 getSelectionText={getSelectionText}
                                 setSourceLang={setSourceLang}
@@ -255,9 +240,14 @@ export default function EditorToolbar(props) {
                                 </Stack>
                             </Popover>
 
-
-                            <FileShareModal owner={owner} fileId={fileId} fileTitle={file.title}
-                                            buttonType={'icon'} file={file} fileSharedUsers={fileSharedUsers}/>
+                            {owner.id === userId ?
+                                <FileShareModal owner={owner} fileId={fileId} fileTitle={file.title}
+                                                buttonType={'icon'} file={file} fileSharedUsers={fileSharedUsers}/>
+                                :
+                                <Tooltip title="Shared with you">
+                                    <GroupsIcon fontSize={"small"}/>
+                                </Tooltip>
+                            }
                         </Stack>
 
                     </MenuControlsContainer>

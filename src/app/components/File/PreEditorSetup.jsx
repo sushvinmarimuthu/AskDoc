@@ -1,8 +1,5 @@
 "use client";
 
-import '@/app/css/CustomGutter.css';
-import '@/app/css/collaboration.css';
-
 import {FontSize, LinkBubbleMenuHandler, ResizableImage} from "mui-tiptap";
 import {useEditor} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -32,7 +29,6 @@ async function handleFileUpdate(fileData, fileId) {
     const formData = new FormData();
     formData.append('fileData', fileData);
     formData.append('fileId', fileId);
-
     await saveFileData(formData);
 }
 
@@ -126,7 +122,7 @@ export default function PreEditorSetup(props) {
         <>
             {editor && <Editor userId={userId} fileId={fileId} searchParams={searchParams} editor={editor}
                                user={user} file={file} fileAccess={fileAccess} files={files} owner={owner}
-                               fileSharedUsers={fileSharedUsers} fileData={fileData} ydoc={yDoc} status={status}/>}
+                               fileSharedUsers={fileSharedUsers} fileData={fileData} yDoc={yDoc} status={status}/>}
         </>
     );
 }

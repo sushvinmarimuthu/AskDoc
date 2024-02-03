@@ -5,7 +5,6 @@ import Loading from "@/app/[id]/loading";
 import React, {Suspense} from "react";
 import {getSharedUsers, getUserFiles} from "@/app/lib/FileActions";
 import {notFound} from "next/navigation";
-import PreEditorSetup from "@/app/components/File/PreEditorSetup";
 import ProviderSetup from "@/app/components/File/ProviderSetup";
 import jsonwebtoken from "jsonwebtoken";
 

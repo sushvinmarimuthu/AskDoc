@@ -3,7 +3,7 @@
 import '@/app/css/CustomGutter.css';
 import '@/app/css/collaboration.css';
 
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import dynamic from "next/dynamic";
 import {Skeleton} from "@mui/material";
 import Box from "@mui/material/Box";
@@ -24,9 +24,8 @@ const FilePreview = dynamic(() => import('@/app/components/File/FilePreview'), {
 })
 
 export default function Editor(props) {
-    const {fileId, userId, searchParams, file, fileAccess, files, owner, fileSharedUsers, editor, fileData, ydoc, status} = props;
+    const {fileId, userId, searchParams, file, fileAccess, files, owner, fileSharedUsers, editor, fileData, yDoc, status} = props;
 
-    const [fileSaved, setFileSaved] = useState(true);
     const [previewFile, setPreviewFile] = useState(null);
 
     async function handlePreviewFile(previewId) {
@@ -35,22 +34,11 @@ export default function Editor(props) {
         })
     }
 
-    useEffect(() => {
-        if (!fileSaved) {
-            const interval = setInterval(() => {
-                setFileSaved(true);
-            }, 3000);
-
-            return () => clearInterval(interval);
-        }
-    }, [fileSaved]);
-
     return (
         <>
             <Box sx={{mt: 2}}>
-                <EditorToolbar editor={editor} fileAccess={fileAccess} fileId={fileId} userId={userId}
-                               fileSaved={fileSaved} file={file} files={files} owner={owner}
-                               fileSharedUsers={fileSharedUsers} handlePreviewFile={handlePreviewFile} status={status} ydoc={ydoc}
+                <EditorToolbar editor={editor} fileAccess={fileAccess} fileId={fileId} userId={userId} file={file} files={files} owner={owner}
+                               fileSharedUsers={fileSharedUsers} handlePreviewFile={handlePreviewFile} status={status} yDoc={yDoc}
                 />
                 <Divider/>
                 <Splitter direction={SplitDirection.Horizontal}
@@ -89,7 +77,7 @@ export default function Editor(props) {
                                                 boxShadow: 2,
                                             }}>
                                                 <FilePreview fileData={previewFile.fileData}/>
-                                                {/*<EditorPreviewComp editor={editor} ydoc={ydoc} fileData={previewFile.fileData}/>*/}
+                                                {/*<EditorPreviewComp editor={editor} yDoc={yDoc} fileData={previewFile.fileData}/>*/}
                                             </Box>
                                         :
 
@@ -106,7 +94,7 @@ export default function Editor(props) {
                                                 boxShadow: 2,
                                             }}>
                                                 <FilePreview fileData={fileData}/>
-                                                {/*<EditorPreviewComp editor={editor} ydoc={ydoc} fileData={fileData}/>*/}
+                                                {/*<EditorPreviewComp editor={editor} yDoc={yDoc} fileData={fileData}/>*/}
                                             </Box>
                                     }
                                 </Box>
