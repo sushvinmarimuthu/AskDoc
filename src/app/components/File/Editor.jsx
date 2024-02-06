@@ -12,6 +12,7 @@ import Divider from "@mui/material/Divider";
 import EditorToolbar from "@/app/components/Editor/EditorToolbar";
 import {getFile} from "@/app/lib/FileActions";
 import Typography from "@mui/material/Typography";
+import EditorPreviewComp from "@/app/components/Editor/EditorPreviewComp";
 
 const FileEditor = dynamic(() => import('@/app/components/File/FileEditor'), {
     ssr: false,
@@ -24,7 +25,7 @@ const FilePreview = dynamic(() => import('@/app/components/File/FilePreview'), {
 })
 
 export default function Editor(props) {
-    const {fileId, userId, searchParams, file, fileAccess, files, owner, fileSharedUsers, editor, fileData, yDoc, status} = props;
+    const {fileId, userId, searchParams, file, fileAccess, files, owner, fileSharedUsers, editor, fileData, setFileData, yDoc, status} = props;
 
     const [previewFile, setPreviewFile] = useState(null);
 
@@ -77,7 +78,6 @@ export default function Editor(props) {
                                                 boxShadow: 2,
                                             }}>
                                                 <FilePreview fileData={previewFile.fileData}/>
-                                                {/*<EditorPreviewComp editor={editor} yDoc={yDoc} fileData={previewFile.fileData}/>*/}
                                             </Box>
                                         :
 
@@ -93,8 +93,7 @@ export default function Editor(props) {
                                                 backgroundColor: 'white',
                                                 boxShadow: 2,
                                             }}>
-                                                <FilePreview fileData={fileData}/>
-                                                {/*<EditorPreviewComp editor={editor} yDoc={yDoc} fileData={fileData}/>*/}
+                                                <EditorPreviewComp yDoc={yDoc}/>
                                             </Box>
                                     }
                                 </Box>

@@ -19,11 +19,9 @@ import {Highlight} from "@tiptap/extension-highlight";
 import {Color} from "@tiptap/extension-color";
 import {Link} from "@tiptap/extension-link";
 import Box from "@mui/material/Box";
-import {useEffect} from "react";
 
 
-export default function EditorPreviewComp({yDoc, fileData}) {
-
+export default function EditorPreviewComp({yDoc}) {
     const editor = useEditor({
         extensions: [
             Document,
@@ -61,14 +59,8 @@ export default function EditorPreviewComp({yDoc, fileData}) {
                 document: yDoc,
             }),
         ],
-        content: fileData,
     });
 
-    useEffect(() => {
-        if (editor && fileData) {
-            editor.commands.setContent(fileData)
-        }
-    }, [fileData]);
 
     return (
         <>

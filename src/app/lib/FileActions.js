@@ -173,6 +173,7 @@ export async function getFile(fileId) {
 export async function textTranslation(formData) {
     let result;
     const text = formData.get('text');
+    const action = formData.get('action');
     const source_lang = formData.get('source_lang');
     const target_lang = formData.get('target_lang');
 
@@ -272,4 +273,9 @@ export async function getSharedUsers(fileId) {
     }
 
     return JSON.parse(JSON.stringify(result));
+}
+
+
+export async function buildIndex(userFiles) {
+    console.log(userFiles)
 }

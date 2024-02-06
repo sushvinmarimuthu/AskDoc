@@ -23,7 +23,7 @@ export default async function HomePage({params, searchParams}) {
                     height: '35px',
                     bgcolor: 'white'
                 }}/>}>
-                    <Search/>
+                    <Search userFiles={userFiles}/>
                 </Suspense>
             </Box>
 

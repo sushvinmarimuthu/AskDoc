@@ -122,7 +122,7 @@ export default function PreEditorSetup(props) {
         <>
             {editor && <Editor userId={userId} fileId={fileId} searchParams={searchParams} editor={editor}
                                user={user} file={file} fileAccess={fileAccess} files={files} owner={owner}
-                               fileSharedUsers={fileSharedUsers} fileData={fileData} yDoc={yDoc} status={status}/>}
+                               fileSharedUsers={fileSharedUsers} fileData={fileData} setFileData={setFileData} yDoc={yDoc} status={status}/>}
         </>
     );
 }
