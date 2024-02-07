@@ -25,7 +25,20 @@ const FilePreview = dynamic(() => import('@/app/components/File/FilePreview'), {
 })
 
 export default function Editor(props) {
-    const {fileId, userId, searchParams, file, fileAccess, files, owner, fileSharedUsers, editor, yDoc, status} = props;
+    const {
+        fileId,
+        userId,
+        searchParams,
+        file,
+        fileAccess,
+        files,
+        owner,
+        fileSharedUsers,
+        editor,
+        yDoc,
+        status,
+        fileData, cursorPos
+    } = props;
 
     const [previewFile, setPreviewFile] = useState(null);
 
@@ -38,9 +51,9 @@ export default function Editor(props) {
     return (
         <>
             <Box sx={{mt: 2}}>
-                <EditorToolbar editor={editor} fileAccess={fileAccess} fileId={fileId} userId={userId} file={file} files={files} owner={owner}
-                               fileSharedUsers={fileSharedUsers} handlePreviewFile={handlePreviewFile} status={status} yDoc={yDoc}
-                               previewFileId={previewFile?._id}
+                <EditorToolbar editor={editor} fileAccess={fileAccess} fileId={fileId} userId={userId} file={file}
+                               files={files} owner={owner} fileSharedUsers={fileSharedUsers} handlePreviewFile={handlePreviewFile}
+                               status={status} yDoc={yDoc} previewFileId={previewFile?._id} cursorPos={cursorPos}
                 />
                 <Divider/>
                 <Splitter direction={SplitDirection.Horizontal}
@@ -71,11 +84,8 @@ export default function Editor(props) {
                                                 style={{minHeight: '100vh', width: '100%'}}/>
                                             :
                                             <Box sx={{
-                                                borderRadius: '0 0 0 10px',
                                                 display: "flex",
                                                 flexDirection: "column",
-                                                height: "700px",
-                                                backgroundColor: 'white',
                                                 boxShadow: 2,
                                             }}>
                                                 <FilePreview fileData={previewFile.fileData}/>
@@ -87,14 +97,11 @@ export default function Editor(props) {
                                                     style={{minHeight: '100vh', width: '100%'}}/>
                                             :
                                             <Box sx={{
-                                                borderRadius: '0 0 0 10px',
                                                 display: "flex",
                                                 flexDirection: "column",
-                                                height: "700px",
-                                                backgroundColor: 'white',
                                                 boxShadow: 2,
                                             }}>
-                                                <EditorPreviewComp yDoc={yDoc}/>
+                                                <FilePreview fileData={fileData}/>
                                             </Box>
                                     }
                                 </Box>
@@ -110,8 +117,7 @@ export default function Editor(props) {
                         height: "700px",
                         backgroundColor: 'white',
                         boxShadow: 2
-                    }}
-                    >
+                    }}>
                         <FileEditor editor={editor} mode={searchParams.mode}/>
                     </Box>
                 </Splitter>

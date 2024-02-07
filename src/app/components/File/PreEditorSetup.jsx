@@ -37,6 +37,7 @@ export default function PreEditorSetup(props) {
     const [status, setStatus] = useState('Connecting...');
 
     const [fileData, setFileData] = useState(file.fileData);
+    const [cursorPos, setCursor] = useState(0);
 
     const editor = useEditor({
         onCreate({editor}) {
@@ -99,6 +100,10 @@ export default function PreEditorSetup(props) {
             if (file.type !== 'application/pdf') {
                 await handleFileUpdate(editor.getHTML(), fileId)
             }
+        },
+
+        onSelectionUpdate({editor}) {
+            setCursor(editor.state.tr.selection.anchor);
         }
     });
 
@@ -118,7 +123,9 @@ export default function PreEditorSetup(props) {
         <>
             {editor && <Editor userId={userId} fileId={fileId} searchParams={searchParams} editor={editor}
                                user={user} file={file} fileAccess={fileAccess} files={files} owner={owner}
-                               fileSharedUsers={fileSharedUsers} fileData={fileData} setFileData={setFileData} yDoc={yDoc} status={status}/>}
+                               fileSharedUsers={fileSharedUsers} fileData={fileData} setFileData={setFileData}
+                               yDoc={yDoc} cursorPos={cursorPos} status={status}
+            />}
         </>
     );
 }

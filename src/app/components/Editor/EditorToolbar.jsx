@@ -26,7 +26,7 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import GroupsIcon from "@mui/icons-material/Groups";
 
 export default function EditorToolbar(props) {
-    let {editor, fileAccess, fileId, userId, file, files, owner, fileSharedUsers, handlePreviewFile, yDoc, status, previewFileId} = props;
+    let {editor, fileAccess, fileId, userId, file, files, owner, fileSharedUsers, handlePreviewFile, yDoc, status, previewFileId, cursorPos} = props;
     const [sourceLang, setSourceLang] = useState('eng');
     const [targetLang, setTargetLang] = useState('');
     const router = useRouter();
@@ -51,9 +51,12 @@ export default function EditorToolbar(props) {
                             if (response === undefined) {
                                 toast("Please, select any other language.")
                             } else {
-                                range.collapse(false);
-                                range.insertNode(document.createTextNode(" " + response));
-                                sel.collapseToEnd();
+                                editor.commands.insertContentAt(cursorPos, ` ${response} `, {
+                                    updateSelection: true,
+                                    parseOptions: {
+                                        preserveWhitespace: 'full',
+                                    }
+                                })
                             }
                         })
                     } else {

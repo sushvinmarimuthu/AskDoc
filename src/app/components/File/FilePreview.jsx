@@ -28,7 +28,7 @@ export default function FilePreview({fileData}) {
 
     return (
         <>
-            <RichTextReadOnly variant={'outlined'} content={fileData} style={{minHeight: '100vh'}} extensions={[
+            <RichTextReadOnly variant={'outlined'} content={fileData} extensions={[
                 StarterKit, Underline, Superscript, Subscript, TextStyle, FontFamily,
                 TextAlign.configure({
                     types: ['heading', 'paragraph'],
