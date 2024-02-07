@@ -25,7 +25,7 @@ const FilePreview = dynamic(() => import('@/app/components/File/FilePreview'), {
 })
 
 export default function Editor(props) {
-    const {fileId, userId, searchParams, file, fileAccess, files, owner, fileSharedUsers, editor, fileData, setFileData, yDoc, status} = props;
+    const {fileId, userId, searchParams, file, fileAccess, files, owner, fileSharedUsers, editor, yDoc, status} = props;
 
     const [previewFile, setPreviewFile] = useState(null);
 
@@ -40,6 +40,7 @@ export default function Editor(props) {
             <Box sx={{mt: 2}}>
                 <EditorToolbar editor={editor} fileAccess={fileAccess} fileId={fileId} userId={userId} file={file} files={files} owner={owner}
                                fileSharedUsers={fileSharedUsers} handlePreviewFile={handlePreviewFile} status={status} yDoc={yDoc}
+                               previewFileId={previewFile?._id}
                 />
                 <Divider/>
                 <Splitter direction={SplitDirection.Horizontal}

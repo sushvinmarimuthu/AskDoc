@@ -95,13 +95,9 @@ export default function PreEditorSetup(props) {
         autofocus: true,
 
         async onUpdate({editor}) {
-            console.log("Updated...")
             setFileData(editor.getHTML());
             if (file.type !== 'application/pdf') {
                 await handleFileUpdate(editor.getHTML(), fileId)
-                    .then(() => {
-                        console.log("File saved...")
-                    });
             }
         }
     });

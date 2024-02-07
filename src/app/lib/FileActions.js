@@ -173,7 +173,6 @@ export async function getFile(fileId) {
 export async function textTranslation(formData) {
     let result;
     const text = formData.get('text');
-    const action = formData.get('action');
     const source_lang = formData.get('source_lang');
     const target_lang = formData.get('target_lang');
 
@@ -187,6 +186,14 @@ export async function textTranslation(formData) {
     }).then(response => response.json().then(json => {
         result = json.data;
     }));
+
+    return result;
+}
+
+export async function textQA(formData) {
+    let result;
+    const text = formData.get('text');
+    const previewFileId = formData.get('previewFileId');
 
     return result;
 }

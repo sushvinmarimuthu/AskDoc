@@ -21,25 +21,12 @@ import Button from "@mui/material/Button";
 import {useRouter} from "next/navigation";
 import FileShareModal from "@/app/components/File/FileShareModal";
 import IconButton from "@mui/material/IconButton";
-import {createFile, textTranslation} from "@/app/lib/FileActions";
+import {createFile, textQA, textTranslation} from "@/app/lib/FileActions";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import GroupsIcon from "@mui/icons-material/Groups";
-import {useEditor} from "@tiptap/react";
 
 export default function EditorToolbar(props) {
-    let {
-        editor,
-        fileAccess,
-        fileId,
-        userId,
-        file,
-        files,
-        owner,
-        fileSharedUsers,
-        handlePreviewFile,
-        yDoc,
-        status
-    } = props;
+    let {editor, fileAccess, fileId, userId, file, files, owner, fileSharedUsers, handlePreviewFile, yDoc, status, previewFileId} = props;
     const [sourceLang, setSourceLang] = useState('eng');
     const [targetLang, setTargetLang] = useState('');
     const router = useRouter();
@@ -52,24 +39,33 @@ export default function EditorToolbar(props) {
             } else {
                 const sel = window.getSelection();
                 const text = sel.toString();
-
                 if (sel.rangeCount && text !== '') {
                     const range = sel.getRangeAt(0);
-                    const formData = new FormData();
-                    formData.append('text', text);
-                    formData.append('action', action);
-                    formData.append('source_lang', sourceLang);
-                    formData.append('target_lang', targetLang);
+                    if (action === 'TextTranslation') {
+                        const formData = new FormData();
+                        formData.append('text', text);
+                        formData.append('source_lang', sourceLang);
+                        formData.append('target_lang', targetLang);
 
-                    await textTranslation(formData).then((response) => {
-                        if (response === undefined) {
-                            toast("Please, select any other language.")
-                        } else {
+                        await textTranslation(formData).then((response) => {
+                            if (response === undefined) {
+                                toast("Please, select any other language.")
+                            } else {
+                                range.collapse(false);
+                                range.insertNode(document.createTextNode(" " + response));
+                                sel.collapseToEnd();
+                            }
+                        })
+                    } else {
+                        const formData = new FormData();
+                        formData.append('text', text);
+                        formData.append("previewFileId", previewFileId);
+                        await textQA(formData).then((response) => {
                             range.collapse(false);
                             range.insertNode(document.createTextNode(" " + response));
                             sel.collapseToEnd();
-                        }
-                    })
+                        })
+                    }
                 }
             }
         } else {

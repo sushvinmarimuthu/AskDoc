@@ -88,7 +88,7 @@ export const authOptions = {
 
             return Promise.resolve(session);
         },
-        jwt: async ({token, user, profile, account}) => {
+        jwt: async ({token, user, profile}) => {
             if (user) {
                 token._id = user._id || user.id;
                 token.jwt = user.jwt;
